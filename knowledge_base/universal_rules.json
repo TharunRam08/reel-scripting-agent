@@ -1,0 +1,44 @@
+[
+  {
+    "rule_id": 1,
+    "name": "No Diagnosis",
+    "statement": "No diagnosis. A reel can explain what a symptom may mean. It cannot tell someone what they have.",
+    "rationale": "A reel can explain what a symptom may mean, but cannot tell a viewer what they individually have.",
+    "enforcement": "Prohibit diagnostic statements such as 'You have condition X'. Require probabilistic language ('This could indicate', 'Common reasons include')."
+  },
+  {
+    "rule_id": 2,
+    "name": "No Dosages, Brand Names, or Prescribing",
+    "statement": "No dosages, no brand names, no prescribing. Not even in passing, not even for common drugs.",
+    "rationale": "Not even in passing, not even for common over-the-counter drugs.",
+    "enforcement": "Strictly filter out specific medication brands, milligram dosages, and prescription directives."
+  },
+  {
+    "rule_id": 3,
+    "name": "Mandatory Clinical Consultation Threshold",
+    "statement": "Always include a threshold that sends the viewer to a real consultation. Some sign, duration or combination that means see someone in person.",
+    "rationale": "Every script must provide a clear boundary condition that tells the patient when to seek in-person medical care.",
+    "enforcement": "Ensure script contains an explicit threshold (e.g. duration > 2 weeks, specific red-flag combination) directing viewers to a doctor."
+  },
+  {
+    "rule_id": 4,
+    "name": "No Identifiable Patient Details",
+    "statement": "No identifiable patient details. Change the details in any case story, and never use photographs or names.",
+    "rationale": "Patient privacy and medical ethics require total anonymization.",
+    "enforcement": "Ensure all case stories change biographical details, omit hospital names/dates, and avoid identifiable personal histories."
+  },
+  {
+    "rule_id": 5,
+    "name": "One Call-To-Action (CTA) Per Reel",
+    "statement": "One call to action per reel. Three CTAs produce fewer results than one.",
+    "rationale": "Three CTAs produce fewer results than one. Asking to comment, save, and share simultaneously ruins conversion.",
+    "enforcement": "Strictly enforce a single, focused CTA at the conclusion."
+  },
+  {
+    "rule_id": 6,
+    "name": "Three-Second Hook Primacy",
+    "statement": "The first three seconds decide everything. Whatever framework you pick, the opening line carries most of the weight.",
+    "rationale": "The first three seconds decide whether the viewer scrolls away or watches the entire reel.",
+    "enforcement": "The opening line must immediately establish tension, curiosity, a direct group callout, or a sharp surprising statement."
+  }
+]

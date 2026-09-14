@@ -1,0 +1,1625 @@
+[
+  {
+    "framework_id": 1,
+    "name": "AIDA",
+    "subtitle": "Attention, Interest, Desire, Action",
+    "description": "This is the oldest structure in advertising and it still works for health content because it follows how a person actually changes their mind. First they notice, then they care, then they want the outcome, then they do something about it. Each stage only exists to earn the next one.",
+    "category": "Awareness & Action",
+    "strategic_goals": [
+      "Reach",
+      "Conversion"
+    ],
+    "best_use_cases": [
+      "Health awareness topics",
+      "treatment explainers",
+      "preventive care",
+      "general education reels."
+    ],
+    "keywords": [
+      "awareness",
+      "general education",
+      "treatment",
+      "preventive care",
+      "early detection",
+      "women's health",
+      "test"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Attention",
+        "description": "Open with a line that breaks the scroll. A number, a blunt statement, or a direct address to a group works better than a greeting."
+      },
+      {
+        "order": 2,
+        "name": "Interest",
+        "description": "Explain why this topic touches the viewer's own life. This is where you make it personal, not academic."
+      },
+      {
+        "order": 3,
+        "name": "Desire",
+        "description": "Show what they gain. Early detection, avoided surgery, better sleep, fewer hospital visits."
+      },
+      {
+        "order": 4,
+        "name": "Action",
+        "description": "One instruction only. Get the test done, comment the keyword, save the reel, book a consult."
+      }
+    ],
+    "example_script": "Most thyroid problems in women go unnoticed for years. Tiredness, hair fall and weight gain get blamed on stress. One blood test settles it. If you have had these signs for three months, get a TSH test done this week.",
+    "pitfall_warning": "AIDA slides into a sales pitch very easily. Keep the desire section medical, not promotional, otherwise the doctor starts sounding like an ad.",
+    "selection_rules": {
+      "topic_types": [
+        "broad health condition",
+        "screening awareness",
+        "preventive routine"
+      ],
+      "angle": "actionable awareness"
+    }
+  },
+  {
+    "framework_id": 2,
+    "name": "PAS",
+    "subtitle": "Problem, Agitate, Solution",
+    "description": "PAS works because people act on discomfort faster than on information. You name something the viewer already feels, show them where it is heading, then hand them the way out. It is the most reliable structure for anything patients quietly ignore.",
+    "category": "Problem Agitation",
+    "strategic_goals": [
+      "Watch Time",
+      "Urgency"
+    ],
+    "best_use_cases": [
+      "Symptoms people postpone",
+      "unhealthy habits",
+      "common patient mistakes."
+    ],
+    "keywords": [
+      "postpone",
+      "habit",
+      "mistake",
+      "delay",
+      "acid reflux",
+      "neglect",
+      "symptom ignored",
+      "daily discomfort"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Problem",
+        "description": "Name the problem in the viewer's own words, not in clinical language."
+      },
+      {
+        "order": 2,
+        "name": "Agitate",
+        "description": "Explain what it becomes if left alone. Stay factual and specific."
+      },
+      {
+        "order": 3,
+        "name": "Solution",
+        "description": "Give the correct medical step, simply stated."
+      }
+    ],
+    "example_script": "You take an antacid every night before sleeping. That is not a cure, it is a signal. Long term acid reflux damages the food pipe lining and can change those cells permanently. If it has been more than six weeks, you need an endoscopy, not another tablet.",
+    "pitfall_warning": "The agitate step is where doctors lose credibility fastest. Describe the real consequence, never an exaggerated worst case.",
+    "selection_rules": {
+      "topic_types": [
+        "ignored symptoms",
+        "chronic minor complaints",
+        "unhealthy habits"
+      ],
+      "angle": "stakes escalation"
+    }
+  },
+  {
+    "framework_id": 3,
+    "name": "PASA",
+    "subtitle": "Problem, Agitate, Solution, Action",
+    "description": "PAS with a closing instruction attached. The extra A exists because a solution alone tells the viewer what is true, while an action tells them what to do in the next ten minutes. Use it when the reel has a job beyond awareness.",
+    "category": "Problem Agitation & Engagement",
+    "strategic_goals": [
+      "Shares",
+      "Conversion"
+    ],
+    "best_use_cases": [
+      "Educational reels that also have to generate comments",
+      "saves",
+      "DMs or appointments."
+    ],
+    "keywords": [
+      "family health",
+      "share",
+      "parents",
+      "bp",
+      "hypertension",
+      "silent risk",
+      "stroke",
+      "medication stopping"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Problem",
+        "description": "State the issue plainly."
+      },
+      {
+        "order": 2,
+        "name": "Agitate",
+        "description": "Raise the stakes honestly so the viewer stops scrolling past it."
+      },
+      {
+        "order": 3,
+        "name": "Solution",
+        "description": "Explain the correct approach."
+      },
+      {
+        "order": 4,
+        "name": "Action",
+        "description": "Ask for one specific thing. Do not stack three CTAs."
+      }
+    ],
+    "example_script": "Your father's BP is controlled, so he stopped the tablet. BP does not stay low because of your body, it stays low because of the tablet. Stopping it silently raises stroke risk. Never stop BP medicine without your doctor. Send this reel to whoever needs to hear it at home.",
+    "pitfall_warning": "One CTA per reel. Asking to comment, save and share in the same ending kills all three.",
+    "selection_rules": {
+      "topic_types": [
+        "medication adherence",
+        "family member health",
+        "silent risks"
+      ],
+      "angle": "call-to-action for loved ones"
+    }
+  },
+  {
+    "framework_id": 4,
+    "name": "HPSA",
+    "subtitle": "Hook, Problem, Solution, Action",
+    "description": "The tightest general purpose format for short reels. It is PASA with the agitation removed, which makes it faster and calmer. When you only have thirty seconds and the topic does not need urgency, this is the default choice.",
+    "category": "Fast Explainer",
+    "strategic_goals": [
+      "Reach",
+      "Retention"
+    ],
+    "best_use_cases": [
+      "Short doctor reels in the twenty to forty second range."
+    ],
+    "keywords": [
+      "fast",
+      "short",
+      "knee pain",
+      "exercise",
+      "weight",
+      "quick fix",
+      "aging misconception",
+      "rapid relief"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "Three to five seconds. Make a claim or ask a sharp question."
+      },
+      {
+        "order": 2,
+        "name": "Problem",
+        "description": "One line naming the health issue."
+      },
+      {
+        "order": 3,
+        "name": "Solution",
+        "description": "Two or three practical points, nothing more."
+      },
+      {
+        "order": 4,
+        "name": "Action",
+        "description": "Close with the single next step."
+      }
+    ],
+    "example_script": "Knee pain at forty is not old age. It is usually weak thigh muscles and extra body weight pressing on the joint. Ten minutes of straight leg raises daily and two kilos less on the scale changes it. Start with the leg raises tonight.",
+    "pitfall_warning": "The temptation is to add a fourth and fifth point. Cut them. Short reels lose people at the point where the list stops feeling finishable.",
+    "selection_rules": {
+      "topic_types": [
+        "musculoskeletal",
+        "quick lifestyle correction",
+        "common physical aches"
+      ],
+      "angle": "rapid 30s explainer without heavy agitation"
+    }
+  },
+  {
+    "framework_id": 5,
+    "name": "Hook, Value, CTA",
+    "subtitle": "The three part minimum",
+    "description": "The stripped down version of every other framework. No setup, no build up, just the useful information delivered immediately. It works when the topic is genuinely simple and the viewer does not need convincing that it matters.",
+    "category": "Quick Value Delivery",
+    "strategic_goals": [
+      "Reach",
+      "Saves"
+    ],
+    "best_use_cases": [
+      "Fast educational reels where the information itself is the whole point."
+    ],
+    "keywords": [
+      "fast",
+      "foods",
+      "sugar",
+      "diet",
+      "healthy illusion",
+      "grocery",
+      "nutrition",
+      "instant takeaway"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "Open directly on the topic."
+      },
+      {
+        "order": 2,
+        "name": "Value",
+        "description": "Deliver the information with no preamble."
+      },
+      {
+        "order": 3,
+        "name": "CTA",
+        "description": "Close in one line."
+      }
+    ],
+    "example_script": "Three foods that quietly raise your sugar even though they taste healthy. Fruit juice, brown bread, and flavoured yogurt. Check the label before you buy any of them. Save this for your next grocery run.",
+    "pitfall_warning": "If the topic actually needs explanation, this format will feel abrupt and the reel will not hold. Use the Hook to Explanation format instead.",
+    "selection_rules": {
+      "topic_types": [
+        "food swaps",
+        "hidden ingredients",
+        "rapid factual revelations"
+      ],
+      "angle": "zero-preamble direct value"
+    }
+  },
+  {
+    "framework_id": 6,
+    "name": "Hook, Explanation, CTA",
+    "subtitle": "The reason behind the symptom",
+    "description": "Same shape as the previous one, but the middle is an explanation rather than a list. People remember information far better when they understand the mechanism behind it, and a doctor explaining the why is exactly what the audience came for.",
+    "category": "Mechanism Explainer",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Doctor led educational content where understanding changes behaviour."
+    ],
+    "keywords": [
+      "why",
+      "body mechanism",
+      "night cramps",
+      "magnesium",
+      "blood flow",
+      "dehydration",
+      "muscle",
+      "understanding"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "Name the symptom or the observation."
+      },
+      {
+        "order": 2,
+        "name": "Explanation",
+        "description": "Explain what is happening inside the body, in ordinary language."
+      },
+      {
+        "order": 3,
+        "name": "CTA",
+        "description": "End with the practical takeaway."
+      }
+    ],
+    "example_script": "Why do your legs cramp at night? During sleep your blood flow slows and the calf muscle stays shortened for hours. Low magnesium and dehydration make it worse. Drink water before bed and stretch your calves for thirty seconds. If it happens daily, get your electrolytes checked.",
+    "pitfall_warning": "Keep the explanation to one mechanism. Two mechanisms in a reel means neither one lands.",
+    "selection_rules": {
+      "topic_types": [
+        "daily physiological quirks",
+        "nocturnal symptoms",
+        "hydration and minerals"
+      ],
+      "angle": "explaining biological mechanism to drive habit change"
+    }
+  },
+  {
+    "framework_id": 7,
+    "name": "Hook, Medical Explanation, Solution",
+    "subtitle": "The authority format",
+    "description": "This is the format that makes a doctor look like a doctor. The middle section carries real clinical reasoning, simplified but not diluted, and the ending converts that reasoning into something the viewer can do. It builds the kind of trust that turns viewers into patients.",
+    "category": "Clinical Authority",
+    "strategic_goals": [
+      "Doctor Authority"
+    ],
+    "best_use_cases": [
+      "Authority building",
+      "positioning a doctor as the person who actually explains things."
+    ],
+    "keywords": [
+      "authority",
+      "clinical",
+      "dawn phenomenon",
+      "cortisol",
+      "morning sugar",
+      "glucose",
+      "hormones",
+      "doctor explanation"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "Start with the question or symptom the audience already has."
+      },
+      {
+        "order": 2,
+        "name": "Medical explanation",
+        "description": "Give the real reason. Use the correct term once, then translate it."
+      },
+      {
+        "order": 3,
+        "name": "Solution",
+        "description": "Convert the explanation into an action."
+      }
+    ],
+    "example_script": "Why does your sugar reading go up in the morning even without eating? Between three and eight in the morning your body releases cortisol and growth hormone to wake you up, and both push glucose into the blood. It is called the dawn phenomenon. Shift your dinner earlier and ask your doctor about the timing of your night dose.",
+    "pitfall_warning": "One technical term per reel is credibility. Four is a lecture. Say the term, then immediately say it in plain words.",
+    "selection_rules": {
+      "topic_types": [
+        "counterintuitive lab/body readings",
+        "endocrine & metabolic mechanisms"
+      ],
+      "angle": "doctor clinical reasoning in plain language"
+    }
+  },
+  {
+    "framework_id": 8,
+    "name": "Myth, Truth, Explanation",
+    "subtitle": "Correcting what people already believe",
+    "description": "Myth busting performs well because the viewer already holds the belief, so the correction feels personally relevant. The order matters. State the myth first so people recognise themselves in it, then correct it, then explain why the myth exists at all.",
+    "category": "Myth Busting & Debunking",
+    "strategic_goals": [
+      "Reach",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Widely held health beliefs",
+      "home remedies",
+      "forwarded WhatsApp advice."
+    ],
+    "keywords": [
+      "myth",
+      "truth",
+      "curd at night",
+      "cold",
+      "whatsapp forward",
+      "home remedy",
+      "misconception",
+      "debunk",
+      "viral belief"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Myth",
+        "description": "State the belief exactly as people say it."
+      },
+      {
+        "order": 2,
+        "name": "Truth",
+        "description": "Correct it in one clear sentence."
+      },
+      {
+        "order": 3,
+        "name": "Explanation",
+        "description": "Explain why the belief spread and where it is partly right."
+      }
+    ],
+    "example_script": "People say curd at night causes cold. Curd does not cause cold, viruses do. The belief exists because curd is cooling and can thicken mucus slightly in someone who already has a blocked nose. If you are healthy, curd at night is completely fine.",
+    "pitfall_warning": "Do not mock the belief. Half your audience holds it, and mocking them ends the reel emotionally before it ends technically.",
+    "selection_rules": {
+      "topic_types": [
+        "cultural health myths",
+        "home remedies",
+        "whatsapp health claims"
+      ],
+      "angle": "respectful correction of popular beliefs"
+    }
+  },
+  {
+    "framework_id": 9,
+    "name": "Mistake, Consequence, Fix",
+    "subtitle": "Behaviour correction",
+    "description": "Aimed squarely at something the viewer is doing right now. Because it names an action rather than a condition, it produces stronger recognition than symptom content, and the fix gives them a way to resolve the discomfort immediately.",
+    "category": "Behavior Correction",
+    "strategic_goals": [
+      "Reach",
+      "Saves"
+    ],
+    "best_use_cases": [
+      "Lifestyle mistakes",
+      "medication habits",
+      "self treatment."
+    ],
+    "keywords": [
+      "mistake",
+      "habit",
+      "crushing tablets",
+      "medication error",
+      "consequence",
+      "fix",
+      "daily behavior",
+      "self treatment"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Mistake",
+        "description": "Name the exact behaviour."
+      },
+      {
+        "order": 2,
+        "name": "Consequence",
+        "description": "Explain what it causes over time."
+      },
+      {
+        "order": 3,
+        "name": "Fix",
+        "description": "Give the better alternative in a single step."
+      }
+    ],
+    "example_script": "Crushing tablets to swallow them easily. Many tablets have a slow release coating, and crushing dumps the full dose into your body at once. If a tablet is hard to swallow, ask your doctor for a syrup or a smaller strength instead.",
+    "pitfall_warning": "Address the mistake, not the person. Say the habit is common, then correct it.",
+    "selection_rules": {
+      "topic_types": [
+        "daily routine errors",
+        "pill taking errors",
+        "everyday health blunders"
+      ],
+      "angle": "correcting specific observable actions"
+    }
+  },
+  {
+    "framework_id": 10,
+    "name": "Symptom, Possible Reason, What To Do",
+    "subtitle": "The safe symptom format",
+    "description": "The standard structure for symptom content, built so the doctor educates without diagnosing. The plural in possible reasons is deliberate. Listing several causes tells the viewer that a reel cannot decide their case, which is both accurate and protective.",
+    "category": "Safe Symptom Triage",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Common symptoms people search for before they see a doctor."
+    ],
+    "keywords": [
+      "symptom",
+      "chest burning",
+      "heart issue",
+      "acid reflux",
+      "causes",
+      "what to do",
+      "consultation",
+      "search symptom"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Symptom",
+        "description": "Describe it the way a patient would describe it."
+      },
+      {
+        "order": 2,
+        "name": "Possible reasons",
+        "description": "Give two or three, ordered from most to least common."
+      },
+      {
+        "order": 3,
+        "name": "What to do",
+        "description": "State the point at which they should see someone."
+      }
+    ],
+    "example_script": "Chest burning after meals is usually acid reflux, sometimes gastritis, and occasionally a heart issue in people over forty with diabetes or BP. If it comes with sweating, jaw pain or breathlessness, treat it as an emergency and go to a hospital immediately.",
+    "pitfall_warning": "Never diagnose through a reel. Always give a threshold that sends them to an actual consultation.",
+    "selection_rules": {
+      "topic_types": [
+        "frequently searched symptoms",
+        "overlapping diagnostic signs"
+      ],
+      "angle": "non-prescriptive differential education"
+    }
+  },
+  {
+    "framework_id": 11,
+    "name": "Normal vs Red Flag",
+    "subtitle": "Normal situation, warning sign, action",
+    "description": "One of the most genuinely useful things a doctor can publish. It draws the line between what can wait and what cannot. It also calms the anxious viewer while catching the one who is actually in danger, which is why these reels get forwarded within families.",
+    "category": "Emergency Awareness & Triage",
+    "strategic_goals": [
+      "Shares",
+      "Urgency"
+    ],
+    "best_use_cases": [
+      "Emergency awareness",
+      "serious symptoms",
+      "anything where timing decides the outcome."
+    ],
+    "keywords": [
+      "normal",
+      "red flag",
+      "warning sign",
+      "fever",
+      "dengue",
+      "emergency",
+      "timing",
+      "hospital",
+      "critical"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Normal",
+        "description": "Describe the version that does not need panic."
+      },
+      {
+        "order": 2,
+        "name": "Red flag",
+        "description": "List the specific signs that change the picture."
+      },
+      {
+        "order": 3,
+        "name": "Action",
+        "description": "Say exactly what to do and how fast."
+      }
+    ],
+    "example_script": "A fever for two or three days with body pain is usually viral and settles on its own. Bleeding gums, black stools, severe stomach pain or a sudden drop in urine are not viral fever signs. In dengue season, those four mean you go to a hospital the same day.",
+    "pitfall_warning": "Red flags must be specific and countable. Vague warnings like feeling unwell make the whole reel useless.",
+    "selection_rules": {
+      "topic_types": [
+        "acute symptoms",
+        "seasonal infections",
+        "emergency warning signs"
+      ],
+      "angle": "urgent boundary between waiting and rushing to hospital"
+    }
+  },
+  {
+    "framework_id": 12,
+    "name": "Fear, Explanation, Reassurance, Solution",
+    "subtitle": "Handling serious topics responsibly",
+    "description": "Serious topics need attention without panic. The reassurance step is what separates this from fear mongering. You acknowledge the risk, explain the mechanism, tell the viewer it is manageable, then show them how. Skipping reassurance leaves people scared and passive, which changes nothing.",
+    "category": "Serious Health Reassurance",
+    "strategic_goals": [
+      "Watch Time",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Cancer awareness",
+      "heart attacks",
+      "strokes",
+      "kidney failure",
+      "anything with a frightening reputation."
+    ],
+    "keywords": [
+      "fear",
+      "kidney",
+      "cancer",
+      "heart attack",
+      "stroke",
+      "scary",
+      "reassurance",
+      "creatinine",
+      "early detection"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Fear",
+        "description": "Name the real risk honestly."
+      },
+      {
+        "order": 2,
+        "name": "Explanation",
+        "description": "Explain the medical reason behind it."
+      },
+      {
+        "order": 3,
+        "name": "Reassurance",
+        "description": "State what is in the patient's control."
+      },
+      {
+        "order": 4,
+        "name": "Solution",
+        "description": "Give the concrete next step."
+      }
+    ],
+    "example_script": "Kidneys can lose most of their function before you feel anything. It happens because the remaining tissue compensates until it cannot. The reassuring part is that a creatinine test costs very little and catches it early. If you have diabetes or BP, do that test once a year.",
+    "pitfall_warning": "Never end on the fear. A reel that raises alarm and gives no next step does harm.",
+    "selection_rules": {
+      "topic_types": [
+        "feared diseases",
+        "silent organ failure",
+        "asymptomatic chronic illness"
+      ],
+      "angle": "defusing panic with clinical explanation and actionable reassurance"
+    }
+  },
+  {
+    "framework_id": 13,
+    "name": "Question, Answer, Explanation",
+    "subtitle": "Direct answer first",
+    "description": "Answer first, explain second. This runs against how doctors are trained to speak, and that is exactly why it works on social media. The viewer gets what they came for in the first five seconds and stays for the reasoning instead of waiting for it.",
+    "category": "Direct FAQ Explainer",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Frequently asked questions and recurring patient doubts."
+    ],
+    "keywords": [
+      "faq",
+      "question",
+      "answer",
+      "can a diabetic eat rice",
+      "carbs",
+      "food question",
+      "patient doubt",
+      "direct answer"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Question",
+        "description": "Ask it exactly as patients ask it."
+      },
+      {
+        "order": 2,
+        "name": "Answer",
+        "description": "Yes, no, or the direct number. No hedging."
+      },
+      {
+        "order": 3,
+        "name": "Explanation",
+        "description": "Give the reasoning and the exception."
+      }
+    ],
+    "example_script": "Can a diabetic eat rice? Yes. The problem is quantity and what is on the plate with it. One cup of rice with dal, vegetables and curd raises sugar far less than two cups with a light curry. Fill half the plate with vegetables and the rice takes care of itself.",
+    "pitfall_warning": "If the honest answer is it depends, say what it depends on within the same breath. Never leave the viewer without an answer.",
+    "selection_rules": {
+      "topic_types": [
+        "common patient dilemmas",
+        "dietary permissions",
+        "controversial foods"
+      ],
+      "angle": "immediate definitive answer followed by practical nuance"
+    }
+  },
+  {
+    "framework_id": 14,
+    "name": "Patient Question, Doctor Answer",
+    "subtitle": "Consultation style",
+    "description": "Structurally similar to the previous framework, but performed as a two person exchange. The value is emotional rather than informational. The viewer watches someone like them ask the thing they were embarrassed to ask, and gets to hear the answer without having to ask it.",
+    "category": "Consultation Dialogue",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Relatability"
+    ],
+    "best_use_cases": [
+      "Awkward questions",
+      "first visit anxiety",
+      "showing the doctor's bedside manner."
+    ],
+    "keywords": [
+      "patient question",
+      "doctor answer",
+      "embarrassing",
+      "thyroid tablet",
+      "dialogue",
+      "bedside manner",
+      "awkward doubt"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Patient",
+        "description": "Ask a natural, slightly hesitant question."
+      },
+      {
+        "order": 2,
+        "name": "Doctor",
+        "description": "Answer directly and without judgement."
+      },
+      {
+        "order": 3,
+        "name": "Explanation",
+        "description": "Add the short medical reason."
+      },
+      {
+        "order": 4,
+        "name": "Guidance",
+        "description": "Close with what the patient should do."
+      }
+    ],
+    "example_script": "Doctor, I stopped my thyroid tablet because I felt fine. That feeling fine is the tablet working. Thyroid hormone does not restart on its own once the gland has stopped. Restart it and get your TSH checked in six weeks.",
+    "pitfall_warning": "The patient line has to sound like a real person. Scripted patient dialogue is obvious within two seconds and it takes the doctor's credibility down with it.",
+    "selection_rules": {
+      "topic_types": [
+        "awkward patient questions",
+        "treatment compliance confessions"
+      ],
+      "angle": "two-person supportive bedside consultation"
+    }
+  },
+  {
+    "framework_id": 15,
+    "name": "What Happens If",
+    "subtitle": "Consequence question, explanation, prevention",
+    "description": "Opens on curiosity rather than a problem. Because the hook is a question about consequences, the viewer stays to find out what happens to their own body. It suits habits people know are questionable but have never seen explained.",
+    "category": "Physiology & Habit Consequence",
+    "strategic_goals": [
+      "Watch Time",
+      "Reach"
+    ],
+    "best_use_cases": [
+      "Food",
+      "sleep",
+      "screen time",
+      "alcohol",
+      "skipping meals",
+      "sitting all day."
+    ],
+    "keywords": [
+      "what happens if",
+      "skipping breakfast",
+      "junk food",
+      "sugar rush",
+      "sitting all day",
+      "sleep loss",
+      "cortisol",
+      "body reaction"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "What happens if",
+        "description": "Ask the consequence question about a common habit."
+      },
+      {
+        "order": 2,
+        "name": "Explanation",
+        "description": "Describe what actually happens inside the body."
+      },
+      {
+        "order": 3,
+        "name": "Prevention",
+        "description": "Give the correction."
+      }
+    ],
+    "example_script": "What happens if you skip breakfast every day? Your body pulls glucose from stored reserves and raises cortisol to keep you functioning, which is why you get irritable by eleven and overeat at lunch. If mornings are rushed, keep it small. Curd, a banana, a handful of nuts.",
+    "pitfall_warning": "Describe the process, not just the outcome. The inside the body part is what makes this format memorable.",
+    "selection_rules": {
+      "topic_types": [
+        "habitual diet errors",
+        "sedentary lifestyle",
+        "sleep disruption",
+        "fast food binge"
+      ],
+      "angle": "curiosity-driven internal bodily mechanism"
+    }
+  },
+  {
+    "framework_id": 16,
+    "name": "3 Signs",
+    "subtitle": "The high save format",
+    "description": "Three is the number the format lives on. Two feels incomplete, five stops feeling checkable, three is what a person can hold in their head while thinking about their own family. This is consistently one of the strongest performing structures in health content.",
+    "category": "Early Detection Signs",
+    "strategic_goals": [
+      "Saves",
+      "Reach",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Early detection topics and anything a viewer will check against a parent or spouse."
+    ],
+    "keywords": [
+      "3 signs",
+      "three signs",
+      "liver stress",
+      "early detection",
+      "tiredness",
+      "puffy eyes",
+      "dark stool",
+      "family check"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "Name the condition and the number."
+      },
+      {
+        "order": 2,
+        "name": "Three signs",
+        "description": "Deliver them fast, one line each."
+      },
+      {
+        "order": 3,
+        "name": "Meaning",
+        "description": "Say what the combination may indicate."
+      },
+      {
+        "order": 4,
+        "name": "Next step",
+        "description": "Tell them what to do if they recognised two or more."
+      }
+    ],
+    "example_script": "Three signs your liver is under stress. Constant tiredness after meals. Puffiness around the eyes in the morning. Pale or unusually dark stools. Any two of these together deserve a liver function test.",
+    "pitfall_warning": "Keep it at three. The moment you say and one bonus sign, the format loses the tightness that made it work.",
+    "selection_rules": {
+      "topic_types": [
+        "early warning symptoms",
+        "organ stress indicators"
+      ],
+      "angle": "countable three-sign checkable triage"
+    }
+  },
+  {
+    "framework_id": 17,
+    "name": "3 Mistakes",
+    "subtitle": "Recognition through error",
+    "description": "The same rhythm as three signs, aimed at behaviour instead of symptoms. It performs well because viewers recognise themselves in at least one mistake, and that recognition is what drives the comment and the share.",
+    "category": "Behavior Error Triad",
+    "strategic_goals": [
+      "Reach",
+      "Saves"
+    ],
+    "best_use_cases": [
+      "Medication habits",
+      "diet errors",
+      "self treatment",
+      "post surgery care."
+    ],
+    "keywords": [
+      "3 mistakes",
+      "three mistakes",
+      "bp tablets",
+      "diet errors",
+      "medication mistakes",
+      "habit error",
+      "self care"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Topic",
+        "description": "Set up the area in one line."
+      },
+      {
+        "order": 2,
+        "name": "Three mistakes",
+        "description": "Name each one as an action people take."
+      },
+      {
+        "order": 3,
+        "name": "Takeaway",
+        "description": "Close with one principle that covers all three."
+      }
+    ],
+    "example_script": "Three mistakes people make with BP tablets. Taking it only when the reading is high. Stopping it after a good report. Taking it at a different time every day. Blood pressure medicine works on consistency, not on readings.",
+    "pitfall_warning": "The three mistakes should not be variations of the same mistake. If they overlap, the reel feels padded.",
+    "selection_rules": {
+      "topic_types": [
+        "chronic disease management",
+        "prescription mistakes",
+        "dieting errors"
+      ],
+      "angle": "three distinct behavioral blunders unified by one principle"
+    }
+  },
+  {
+    "framework_id": 18,
+    "name": "Do This, Not That",
+    "subtitle": "Swap based correction",
+    "description": "Instead of telling people to stop something, you give them a replacement. Removal creates resistance while substitution feels achievable, and the contrast makes the reel easy to follow visually as well as verbally.",
+    "category": "Habit Swap & Substitution",
+    "strategic_goals": [
+      "Saves",
+      "Reach"
+    ],
+    "best_use_cases": [
+      "Habit corrections where the underlying need is legitimate."
+    ],
+    "keywords": [
+      "do this not that",
+      "swap",
+      "tea after meal",
+      "iron absorption",
+      "replacement",
+      "diet swap",
+      "practical alternative"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Not that",
+        "description": "Name the common habit."
+      },
+      {
+        "order": 2,
+        "name": "Do this",
+        "description": "Give the direct replacement."
+      },
+      {
+        "order": 3,
+        "name": "Why",
+        "description": "One line on the difference it makes."
+      }
+    ],
+    "example_script": "Do not drink tea immediately after a meal. Wait an hour. Tannins in tea block iron absorption from your food, and in a country where anaemia is this common, that one hour matters more than people think.",
+    "pitfall_warning": "The replacement must be realistic for the audience. Telling people to swap rice for quinoa is advice nobody follows.",
+    "selection_rules": {
+      "topic_types": [
+        "dietary micro-habits",
+        "lifestyle optimizations",
+        "meal timing"
+      ],
+      "angle": "achievable substitution rather than restrictive elimination"
+    }
+  },
+  {
+    "framework_id": 19,
+    "name": "If You Are X, Watch This",
+    "subtitle": "Audience calling",
+    "description": "Opens by naming a group so precisely that everyone outside it scrolls on and everyone inside it stops. Narrowing the audience deliberately raises the completion rate among the people who actually matter for that topic.",
+    "category": "Audience Calling & Demographics",
+    "strategic_goals": [
+      "Reach",
+      "Retention"
+    ],
+    "best_use_cases": [
+      "Age specific",
+      "gender specific or condition specific advice."
+    ],
+    "keywords": [
+      "if you are x",
+      "women over 35",
+      "office workers",
+      "vitamin d",
+      "iron",
+      "demographic",
+      "specific age",
+      "targeted group"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Call the audience",
+        "description": "Name the group in the first two seconds."
+      },
+      {
+        "order": 2,
+        "name": "Their issue",
+        "description": "State the problem specific to them."
+      },
+      {
+        "order": 3,
+        "name": "Two or three points",
+        "description": "Keep it to what applies only to this group."
+      },
+      {
+        "order": 4,
+        "name": "Action",
+        "description": "Close with their next step."
+      }
+    ],
+    "example_script": "If you are a woman over thirty five in an office job, this is for you. You are in the highest risk group for vitamin D deficiency and low iron at the same time. Get both tested together, not separately, and take iron away from your calcium.",
+    "pitfall_warning": "The narrower the group, the better this works. Broad calls like if you are an adult defeat the entire purpose.",
+    "selection_rules": {
+      "topic_types": [
+        "niche demographic risks",
+        "occupational hazards",
+        "gender-specific health"
+      ],
+      "angle": "opening scroll-stopper naming an exact demographic"
+    }
+  },
+  {
+    "framework_id": 20,
+    "name": "Doctor Reacts",
+    "subtitle": "Responding to a claim",
+    "description": "Borrows attention from something already circulating. Because the claim has done the work of getting people interested, the doctor only has to supply the correction. Reaction content also positions the doctor as a filter people can trust, which has value beyond any single reel.",
+    "category": "Viral Claim Reaction",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Reach"
+    ],
+    "best_use_cases": [
+      "Viral health claims",
+      "influencer advice",
+      "trending misinformation",
+      "forwarded remedies."
+    ],
+    "keywords": [
+      "doctor reacts",
+      "lemon water",
+      "belly fat",
+      "viral trend",
+      "influencer claim",
+      "fat burn",
+      "fad diet",
+      "social media claim"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "The claim",
+        "description": "Show or state it clearly."
+      },
+      {
+        "order": 2,
+        "name": "Reaction",
+        "description": "React honestly. Sometimes the claim is partly right, and saying so builds more trust than dismissing it."
+      },
+      {
+        "order": 3,
+        "name": "Correction",
+        "description": "State what is actually true."
+      },
+      {
+        "order": 4,
+        "name": "Explanation",
+        "description": "Give the medical reasoning."
+      }
+    ],
+    "example_script": "A reel says drinking warm water with lemon burns belly fat. It does not burn fat. What it does is fill your stomach before a meal so you eat less, and that is the entire effect. The lemon is not doing anything to your fat cells.",
+    "pitfall_warning": "Do not name and attack individual creators. React to the claim, not the person, and keep it about the medicine.",
+    "selection_rules": {
+      "topic_types": [
+        "viral social media wellness trends",
+        "fad detoxes",
+        "celebrity health claims"
+      ],
+      "angle": "objective medical filter dissecting trending claims"
+    }
+  },
+  {
+    "framework_id": 21,
+    "name": "Story, Lesson, CTA",
+    "subtitle": "Personal branding through cases",
+    "description": "The strongest format for making a doctor feel like a human being. A short account of something seen in practice carries emotional weight that a list of facts cannot, and the lesson lands because the viewer arrived at it through a person rather than a rule.",
+    "category": "Clinical Case Narrative",
+    "strategic_goals": [
+      "Watch Time",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Personal branding",
+      "awareness of delayed treatment",
+      "building emotional connection."
+    ],
+    "keywords": [
+      "story",
+      "case",
+      "patient story",
+      "bp 190",
+      "silent killer",
+      "lesson",
+      "anecdote",
+      "emotional",
+      "hospital visit"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Story",
+        "description": "One short situation. Keep it to two or three sentences."
+      },
+      {
+        "order": 2,
+        "name": "Lesson",
+        "description": "Draw out the health point."
+      },
+      {
+        "order": 3,
+        "name": "CTA",
+        "description": "Close with what the viewer should do differently."
+      }
+    ],
+    "example_script": "A man in his forties came in for a knee problem. His BP reading during the routine check was 190. He had no symptoms at all and had never tested it. He walked in for his knee and walked out on BP medication. Check your BP once a year even when nothing is wrong.",
+    "pitfall_warning": "Never include anything that could identify a patient. Change the details, avoid photographs, and do not name the hospital or the date.",
+    "selection_rules": {
+      "topic_types": [
+        "silent emergencies",
+        "asymptomatic risks",
+        "delayed medical attention"
+      ],
+      "angle": "empathetic real-world patient vignette teaching a universal lesson"
+    }
+  },
+  {
+    "framework_id": 22,
+    "name": "Curiosity Gap",
+    "subtitle": "Withholding the answer",
+    "description": "Opens with something incomplete or counterintuitive so the viewer keeps watching to close the gap in their own head. The gap has to be small enough to be resolved inside the reel, otherwise it reads as clickbait and the audience learns not to trust the account.",
+    "category": "Curiosity Gap Explainer",
+    "strategic_goals": [
+      "Reach",
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Improving retention on topics that would otherwise sound routine."
+    ],
+    "keywords": [
+      "curiosity gap",
+      "morning headache",
+      "sleep apnea",
+      "counterintuitive",
+      "surprising cause",
+      "oxygen drop",
+      "hidden reason"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Open the gap",
+        "description": "Say something surprising or unfinished."
+      },
+      {
+        "order": 2,
+        "name": "Delay",
+        "description": "Add one line of context, no more."
+      },
+      {
+        "order": 3,
+        "name": "Reveal",
+        "description": "Deliver the answer clearly."
+      },
+      {
+        "order": 4,
+        "name": "Takeaway",
+        "description": "Close with what it means for them."
+      }
+    ],
+    "example_script": "The most common reason for morning headaches has nothing to do with your head. It is your breathing at night. Untreated sleep apnoea drops your oxygen repeatedly through the night and you wake up with a dull headache and no memory of why. If you snore heavily, get a sleep study.",
+    "pitfall_warning": "Always close the gap. An unanswered hook feels like a trick and costs you the next reel's attention.",
+    "selection_rules": {
+      "topic_types": [
+        "symptoms with unexpected root causes",
+        "counterintuitive connections"
+      ],
+      "angle": "unresolved opening puzzle resolved before the end"
+    }
+  },
+  {
+    "framework_id": 23,
+    "name": "Open Loop",
+    "subtitle": "Answer held to the end",
+    "description": "A longer form of the curiosity gap. You raise a question at the start and release information in pieces, keeping the central answer for the final seconds. It is the strongest structure for watch time and the easiest one to overplay.",
+    "category": "Open Loop Retention",
+    "strategic_goals": [
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Longer reels of forty five to ninety seconds where you need people to stay to the end."
+    ],
+    "keywords": [
+      "open loop",
+      "blood test",
+      "lipoprotein a",
+      "cholesterol",
+      "heart risk",
+      "genetic",
+      "retention",
+      "delayed answer"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Open the loop",
+        "description": "Pose the question or the incomplete idea."
+      },
+      {
+        "order": 2,
+        "name": "Feed in pieces",
+        "description": "Give useful information along the way so the wait is earned."
+      },
+      {
+        "order": 3,
+        "name": "Hold the answer",
+        "description": "Keep the main point for late in the reel."
+      },
+      {
+        "order": 4,
+        "name": "Close the loop",
+        "description": "Answer it explicitly before the reel ends."
+      }
+    ],
+    "example_script": "There is one blood test most people over forty have never done, and it predicts heart risk better than cholesterol. Not sugar. Not the standard lipid profile. It is Lipoprotein(a), it is largely genetic, and a normal cholesterol report tells you nothing about it. Ask for it once. The value does not change through your life.",
+    "pitfall_warning": "The information you give while holding the answer must be useful on its own. Filler in the middle is where viewers leave.",
+    "selection_rules": {
+      "topic_types": [
+        "underdiagnosed lab parameters",
+        "overlooked risk markers"
+      ],
+      "angle": "progressive clue release with delayed climactic reveal"
+    }
+  },
+  {
+    "framework_id": 24,
+    "name": "Pattern Interrupt",
+    "subtitle": "Contradicting the expected",
+    "description": "Opens by stating the opposite of what the audience assumes a doctor will say. The contradiction creates a small jolt that stops the scroll, and the rest of the reel resolves it. Used well it is memorable. Used often it makes a doctor sound contrarian.",
+    "category": "Pattern Interrupt",
+    "strategic_goals": [
+      "Reach"
+    ],
+    "best_use_cases": [
+      "Widely repeated advice that is oversimplified or wrong."
+    ],
+    "keywords": [
+      "pattern interrupt",
+      "10000 steps",
+      "walking",
+      "contrarian",
+      "myth",
+      "conventional wisdom",
+      "surprising truth"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Interrupt",
+        "description": "State the surprising position directly."
+      },
+      {
+        "order": 2,
+        "name": "Why",
+        "description": "Explain the reasoning immediately. Do not make people wait."
+      },
+      {
+        "order": 3,
+        "name": "Correct view",
+        "description": "Give the accurate, complete picture."
+      }
+    ],
+    "example_script": "Stop counting ten thousand steps. The number came from a Japanese pedometer advertisement, not from research. Studies show most of the benefit arrives between four and seven thousand steps a day. Walk at a pace where talking is slightly difficult, and stop worrying about the number.",
+    "pitfall_warning": "The interrupt must be defensible. Saying something shocking that you then have to walk back damages trust more than a boring hook ever would.",
+    "selection_rules": {
+      "topic_types": [
+        "overstated fitness dogmas",
+        "rigid health rules",
+        "marketing claims"
+      ],
+      "angle": "direct immediate contradiction of dogma with defensible science"
+    }
+  },
+  {
+    "framework_id": 25,
+    "name": "Listicle",
+    "subtitle": "Numbered points",
+    "description": "The most predictable structure and the most saveable. Announcing the number tells the viewer exactly how long the reel will feel, which makes them more likely to start it. Its weakness is that it carries no reasoning, so use it where the points are self explanatory.",
+    "category": "Structured Listicle",
+    "strategic_goals": [
+      "Saves"
+    ],
+    "best_use_cases": [
+      "Tips",
+      "foods",
+      "warning signs",
+      "habits",
+      "questions to ask a doctor."
+    ],
+    "keywords": [
+      "listicle",
+      "questions before surgery",
+      "tips",
+      "foods",
+      "checklist",
+      "numbered",
+      "appointment preparation"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Hook",
+        "description": "State the number and the topic together."
+      },
+      {
+        "order": 2,
+        "name": "Points",
+        "description": "One line each, in the same rhythm."
+      },
+      {
+        "order": 3,
+        "name": "Takeaway",
+        "description": "One closing line that ties them together."
+      },
+      {
+        "order": 4,
+        "name": "CTA",
+        "description": "Ask for the save."
+      }
+    ],
+    "example_script": "Five questions to ask before any surgery. What happens if I do not do this. How many of these have you done. What is the recovery time. What are the chances I will need a second one. What will the total cost be including everything. Save this before your next appointment.",
+    "pitfall_warning": "Four to six points is the range. Beyond that, break it into two reels.",
+    "selection_rules": {
+      "topic_types": [
+        "consultation questions",
+        "healthy grocery items",
+        "practical health tips"
+      ],
+      "angle": "rhythmic 4-to-6 point self-explanatory list"
+    }
+  },
+  {
+    "framework_id": 26,
+    "name": "Comparison",
+    "subtitle": "X vs Y",
+    "description": "Built for the moment a patient is standing in front of two options and does not know the difference. Comparison content ranks well in search and gets saved often because it answers a decision rather than a curiosity.",
+    "category": "Differential Comparison",
+    "strategic_goals": [
+      "Saves",
+      "Doctor Authority"
+    ],
+    "best_use_cases": [
+      "Two conditions that look alike",
+      "two medicines",
+      "two tests",
+      "two treatment paths."
+    ],
+    "keywords": [
+      "comparison",
+      "migraine vs sinus",
+      "headache",
+      "x vs y",
+      "difference",
+      "confused conditions",
+      "two medicines"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Introduce both",
+        "description": "Name them and say why people confuse them."
+      },
+      {
+        "order": 2,
+        "name": "Key differences",
+        "description": "Two or three differences that actually matter to a patient."
+      },
+      {
+        "order": 3,
+        "name": "When each matters",
+        "description": "Say which situation calls for which."
+      },
+      {
+        "order": 4,
+        "name": "Takeaway",
+        "description": "Give the practical rule."
+      }
+    ],
+    "example_script": "Migraine or sinus headache. Migraine is usually one sided, worsens with light and sound, and comes with nausea. Sinus pain sits over the cheeks and forehead, worsens when you bend forward, and comes with a blocked nose. Most people treating sinusitis for years are actually treating migraines.",
+    "pitfall_warning": "Compare on differences a patient can observe themselves. Comparisons based on lab findings are useless in a reel.",
+    "selection_rules": {
+      "topic_types": [
+        "confused lookalike illnesses",
+        "competing treatment paths",
+        "medication choices"
+      ],
+      "angle": "observable side-by-side patient differentiation"
+    }
+  },
+  {
+    "framework_id": 27,
+    "name": "Cause, Effect, Prevention",
+    "subtitle": "The preventive chain",
+    "description": "Shows the full arc from what starts a problem to what it becomes to how it is stopped. It is the clearest way to explain why prevention is worth the effort, because the viewer sees the chain rather than being told to trust it.",
+    "category": "Preventive Disease Chain",
+    "strategic_goals": [
+      "Saves",
+      "Shares"
+    ],
+    "best_use_cases": [
+      "Preventive health",
+      "lifestyle disease",
+      "long term risk."
+    ],
+    "keywords": [
+      "cause effect prevention",
+      "sitting 9 hours",
+      "enzymes",
+      "triglycerides",
+      "lifestyle disease",
+      "walking breaks",
+      "long term risk"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Cause",
+        "description": "Name what starts it."
+      },
+      {
+        "order": 2,
+        "name": "Effect",
+        "description": "Show what it leads to over years, not days."
+      },
+      {
+        "order": 3,
+        "name": "Prevention",
+        "description": "Give the intervention and where in the chain it works."
+      }
+    ],
+    "example_script": "Sitting for nine hours a day slows the enzyme that clears fat from your blood. Over years that shows up as higher triglycerides, insulin resistance and belly fat, even in people who look thin. Standing and walking for three minutes every hour restores most of that enzyme activity. The frequency matters more than the duration.",
+    "pitfall_warning": "Give a realistic timescale. Effects stated without a time frame sound like scare tactics.",
+    "selection_rules": {
+      "topic_types": [
+        "chronic metabolic disease",
+        "sedentary office lifestyle",
+        "cardiovascular risk"
+      ],
+      "angle": "multi-year causal chain leading to realistic micro-intervention"
+    }
+  },
+  {
+    "framework_id": 28,
+    "name": "Why Framework",
+    "subtitle": "Why does this happen, explanation, advice",
+    "description": "Takes something the viewer has experienced and never questioned, and explains the mechanism. It plays directly to a doctor's advantage, because explaining the body is the one thing an audience cannot get from anyone else in their feed.",
+    "category": "Bodily Science Explainer",
+    "strategic_goals": [
+      "Doctor Authority",
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Everyday physical experiences with a clean scientific explanation."
+    ],
+    "keywords": [
+      "why framework",
+      "sleepy after lunch",
+      "postprandial",
+      "insulin",
+      "tryptophan",
+      "serotonin",
+      "digestive blood flow"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Why",
+        "description": "Ask the question the viewer has had but never looked up."
+      },
+      {
+        "order": 2,
+        "name": "Explanation",
+        "description": "Explain the mechanism in ordinary language."
+      },
+      {
+        "order": 3,
+        "name": "Advice",
+        "description": "Close with the practical implication."
+      }
+    ],
+    "example_script": "Why do you feel sleepy right after lunch? Blood flow shifts towards digestion and a heavy carbohydrate meal spikes insulin, which pushes tryptophan into the brain and raises serotonin. A lighter lunch with protein and a ten minute walk after eating removes most of it.",
+    "pitfall_warning": "Simplify without inventing. If the honest mechanism is complicated, explain the part that is true rather than a neat version that is not.",
+    "selection_rules": {
+      "topic_types": [
+        "universal biological experiences",
+        "post-meal sensations",
+        "circadian quirks"
+      ],
+      "angle": "clean scientific explanation of an unexamined daily sensation"
+    }
+  },
+  {
+    "framework_id": 29,
+    "name": "Checklist",
+    "subtitle": "Built for saves",
+    "description": "Made to be returned to rather than watched once. The value is not in the explanation but in the completeness, so the viewer keeps it for a moment that has not arrived yet. This is the highest saving format in health content.",
+    "category": "Practical Kit & Checklist",
+    "strategic_goals": [
+      "Saves"
+    ],
+    "best_use_cases": [
+      "Pre surgery preparation",
+      "hospital admission",
+      "pregnancy visits",
+      "first consultation",
+      "home emergency kit."
+    ],
+    "keywords": [
+      "checklist",
+      "first consultation",
+      "hospital bag",
+      "prescriptions",
+      "reports",
+      "family history",
+      "preparation",
+      "saves"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Introduce",
+        "description": "Say what the checklist is for and when they will need it."
+      },
+      {
+        "order": 2,
+        "name": "Points",
+        "description": "Short, concrete, in the order they will be used."
+      },
+      {
+        "order": 3,
+        "name": "Save prompt",
+        "description": "Ask directly for the save and give the reason."
+      }
+    ],
+    "example_script": "What to carry for a first consultation. Previous prescriptions, not a summary of them. All reports in date order. A list of every tablet you take including supplements. Your family history of diabetes, BP and heart disease. Save this. It will cut your consultation time in half.",
+    "pitfall_warning": "Every point must be something the viewer can physically do or carry. Vague items break the usefulness of a checklist.",
+    "selection_rules": {
+      "topic_types": [
+        "doctor visit preparation",
+        "surgery readiness",
+        "emergency medicine kit"
+      ],
+      "angle": "concrete physical checklist intended for future reference"
+    }
+  },
+  {
+    "framework_id": 30,
+    "name": "Before, After, Bridge",
+    "subtitle": "Showing the change",
+    "description": "Starts in the viewer's current situation, shows them a better one, then explains the single change that connects the two. The bridge is the whole point. Without a specific and believable bridge, this becomes a motivational reel and delivers nothing.",
+    "category": "Transformation & Recovery",
+    "strategic_goals": [
+      "Saves",
+      "Watch Time"
+    ],
+    "best_use_cases": [
+      "Habit change",
+      "recovery journeys",
+      "lifestyle correction."
+    ],
+    "keywords": [
+      "before after bridge",
+      "tired waking up",
+      "sleep schedule",
+      "body clock",
+      "circadian",
+      "habit change",
+      "lifestyle shift"
+    ],
+    "stages": [
+      {
+        "order": 1,
+        "name": "Before",
+        "description": "Describe the current state in recognisable detail."
+      },
+      {
+        "order": 2,
+        "name": "After",
+        "description": "Describe the realistic improved state."
+      },
+      {
+        "order": 3,
+        "name": "Bridge",
+        "description": "Name the one change that makes the difference."
+      }
+    ],
+    "example_script": "Right now you wake up tired even after seven hours of sleep. It is possible to wake up before the alarm and feel clear. The change is not more sleep, it is a fixed wake up time, including on Sundays. Your body clock cannot stabilise if the schedule moves every weekend.",
+    "pitfall_warning": "Keep the after honest. Overpromising in health content is the fastest way to lose the audience you spent months earning.",
+    "selection_rules": {
+      "topic_types": [
+        "chronic fatigue",
+        "routine overhaul",
+        "sleep hygiene recovery"
+      ],
+      "angle": "relatable baseline transformed through a single credible bridge"
+    }
+  }
+]

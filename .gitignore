@@ -1,0 +1,28 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Scratch & Temporary Logs
+*.tmp
+scratch/
+.idea/
+.vscode/
+
+# Generated & Demo Artifacts
+outputs/
+submission/
+junk_food_reel_submission.zip
