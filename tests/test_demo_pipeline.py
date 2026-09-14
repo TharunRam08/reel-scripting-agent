@@ -276,26 +276,65 @@ def test_demo_pipeline():
     print("  [OK] Guard passed: Zero external video APIs imported or called.")
 
     # -------------------------------------------------------------
-    # TEST 9: Locked 5-Shot Architecture Validation
+    # TEST 9: Dynamic Duration-Aware Pipeline & Shot Count Derivation
     # -------------------------------------------------------------
-    print("\n--- TEST 9: Locked 5-Shot Architecture Validation ---")
+    print("\n--- TEST 9: Dynamic Duration-Aware Pipeline & Shot Count Derivation ---")
+    
+    # 1. 8s target -> 1 shot (~8.0s)
+    out_8s = pipeline.run(topic="everyday exercise", target_duration_seconds=8.0)
+    assert out_8s.shot_count == 1, f"Expected 1 shot for 8s, got {out_8s.shot_count}"
+    assert len(out_8s.shots) == 1
+    total_8s = sum(s.duration_seconds for s in out_8s.shots)
+    assert abs(total_8s - 8.0) <= 0.5
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in out_8s.shots)
+    print(f"  [OK] 8s Pipeline: {out_8s.shot_count} shot, {total_8s:.1f}s planned")
+
+    # 2. 15s target -> 2 shots (~15.0s)
+    out_15s = pipeline.run(topic="everyday exercise", target_duration_seconds=15.0)
+    assert out_15s.shot_count == 2, f"Expected 2 shots for 15s, got {out_15s.shot_count}"
+    assert len(out_15s.shots) == 2
+    total_15s = sum(s.duration_seconds for s in out_15s.shots)
+    assert abs(total_15s - 15.0) <= 0.5
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in out_15s.shots)
+    print(f"  [OK] 15s Pipeline: {out_15s.shot_count} shots, {total_15s:.1f}s planned")
+
+    # 3. 30s target -> 4 shots (~30.0s)
+    out_30s = pipeline.run(topic="everyday exercise", target_duration_seconds=30.0)
+    assert out_30s.shot_count == 4, f"Expected 4 shots for 30s, got {out_30s.shot_count}"
+    assert len(out_30s.shots) == 4
+    total_30s = sum(s.duration_seconds for s in out_30s.shots)
+    assert abs(total_30s - 30.0) <= 0.5
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in out_30s.shots)
+    print(f"  [OK] 30s Pipeline: {out_30s.shot_count} shots, {total_30s:.1f}s planned")
+
+    # 4. 45s target -> 6 shots (~45.0s)
+    out_45s = pipeline.run(topic="everyday exercise", target_duration_seconds=45.0)
+    assert out_45s.shot_count == 6, f"Expected 6 shots for 45s, got {out_45s.shot_count}"
+    assert len(out_45s.shots) == 6
+    total_45s = sum(s.duration_seconds for s in out_45s.shots)
+    assert abs(total_45s - 45.0) <= 1.0
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in out_45s.shots)
+    print(f"  [OK] 45s Pipeline: {out_45s.shot_count} shots, {total_45s:.1f}s planned")
+
+    # 5. Invalid parameters rejected
     try:
-        pipeline.run(topic="Junk Food", target_duration_seconds=45.0, shot_count=4)
-        assert False, "Should reject shot_count != 5"
+        pipeline.run(topic="Junk Food", target_duration_seconds=45.0, shot_count=0)
+        assert False, "Should reject shot_count=0"
     except ValueError as e:
-        print(f"  [OK] shot_count=4 rejected: {e}")
+        print(f"  [OK] shot_count=0 rejected: {e}")
 
     try:
-        pipeline.run(topic="Junk Food", target_duration_seconds=45.0, shot_count=6)
-        assert False, "Should reject shot_count != 5"
+        pipeline.run(topic="Junk Food", target_duration_seconds=0.0)
+        assert False, "Should reject target_duration_seconds <= 0"
     except ValueError as e:
-        print(f"  [OK] shot_count=6 rejected: {e}")
+        print(f"  [OK] target_duration_seconds=0 rejected: {e}")
 
-    valid_5shot = pipeline.run(topic="Junk Food", target_duration_seconds=45.0, shot_count=5)
+    # 6. Backward compatible explicit shot_count=5
+    valid_5shot = pipeline.run(topic="Junk Food", target_duration_seconds=40.0, shot_count=5)
     assert valid_5shot.shot_count == 5
     assert len(valid_5shot.shots) == 5
-    assert all(s.duration_seconds <= 8.0 for s in valid_5shot.shots)
-    print("  [OK] Locked 5-shot architecture validated (exactly 5 shots, <= 8.0s each).")
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in valid_5shot.shots)
+    print("  [OK] Explicit shot_count=5 preserved for backward compatibility.")
 
     # -------------------------------------------------------------
     # TEST 10: CLI Formatting Test
@@ -433,15 +472,15 @@ def test_demo_pipeline():
         assert "Invalid file type" in resp_invalid_file.json()["detail"]
         print("  [OK] Invalid file type (.txt) correctly rejected.")
 
-        # 2. Invalid shot number rejection (shot 0 and shot 6)
+        # 2. Invalid shot number rejection (shot 0 and shot 99)
         with open(test_video_path, "rb") as f:
             resp_shot_0 = client.post("/api/upload", data={"shot_number": 0}, files={"file": ("clip.mp4", f, "video/mp4")})
         assert resp_shot_0.status_code == 400
 
         with open(test_video_path, "rb") as f:
-            resp_shot_6 = client.post("/api/upload", data={"shot_number": 6}, files={"file": ("clip.mp4", f, "video/mp4")})
-        assert resp_shot_6.status_code == 400
-        print("  [OK] Invalid shot numbers (0, 6) correctly rejected.")
+            resp_shot_99 = client.post("/api/upload", data={"shot_number": 99}, files={"file": ("clip.mp4", f, "video/mp4")})
+        assert resp_shot_99.status_code == 400
+        print("  [OK] Invalid shot numbers (0, 99) correctly rejected.")
 
         # 3. Empty file rejection
         resp_empty_file = client.post("/api/upload", data={"shot_number": 1}, files={"file": ("empty.mp4", b"", "video/mp4")})

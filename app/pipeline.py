@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from app.agents.topic_analyzer import TopicAnalyzer, TopicAnalysis
 from app.agents.framework_selector import FrameworkSelector, FrameworkSelection
 from app.agents.script_writer import ScriptWriter, ReelScript
-from app.agents.shot_planner import ShotPlanner, ShotPlan, Shot
+from app.agents.shot_planner import ShotPlanner, ShotPlan, Shot, calculate_recommended_shot_count
 
 
 class DemoShotOutput(BaseModel):
@@ -36,7 +36,7 @@ class DemoPipelineOutput(BaseModel):
     shot_count: int = Field(..., description="Number of shots planned.")
     shots: List[DemoShotOutput] = Field(..., description="List of structured shots in chronological sequence.")
     generation_source: str = Field(..., description="Source engine for generation (e.g., groq, deterministic_fallback).")
-    validation_status: str = Field("VALID (5 shots, all <= 8.0s, narration timing verified)", description="Overall validation status.")
+    validation_status: str = Field("VALID (all shots in [4.0s, 8.0s], narration timing verified)", description="Overall validation status.")
     feedback: Optional[str] = Field(None, description="Applied revision feedback, if any.")
     approval_status: str = Field("pending_review", description="Plan review and approval status.")
 
@@ -62,7 +62,7 @@ class ReelDemoPipeline:
         self,
         topic: str = "Junk Food",
         target_duration_seconds: float = 45.0,
-        shot_count: int = 5,
+        shot_count: Optional[int] = None,
         feedback: Optional[str] = None,
     ) -> DemoPipelineOutput:
         """Runs the complete agent pipeline end-to-end and returns a structured DemoPipelineOutput."""
@@ -70,8 +70,11 @@ class ReelDemoPipeline:
             raise ValueError("Topic must not be empty.")
         if target_duration_seconds <= 0:
             raise ValueError(f"target_duration_seconds must be positive, got {target_duration_seconds}")
-        if shot_count != 5:
-            raise ValueError(f"Locked reel architecture requires exactly 5 shots, got {shot_count}")
+
+        if shot_count is None:
+            shot_count = calculate_recommended_shot_count(target_duration_seconds)
+        elif shot_count < 1:
+            raise ValueError(f"shot_count must be at least 1, got {shot_count}")
 
         # Stage 1: Topic Analyzer
         topic_analysis = self.topic_analyzer.analyze(topic.strip())
@@ -118,7 +121,7 @@ class ReelDemoPipeline:
             framework_score=framework_selection.compatibility_score,
             final_script=reel_script.full_script_with_cta,
             target_duration_seconds=target_duration_seconds,
-            shot_count=shot_count,
+            shot_count=len(shot_outputs),
             shots=shot_outputs,
             generation_source=shot_plan.generation_source,
             validation_status=shot_plan.validation_status,
@@ -130,7 +133,7 @@ class ReelDemoPipeline:
 def run_demo_pipeline(
     topic: str = "Junk Food",
     target_duration_seconds: float = 45.0,
-    shot_count: int = 5,
+    shot_count: Optional[int] = None,
     feedback: Optional[str] = None,
 ) -> DemoPipelineOutput:
     """Convenience helper to instantiate and run the demo pipeline."""
@@ -145,6 +148,7 @@ def run_demo_pipeline(
 
 def format_cli_output(output: DemoPipelineOutput) -> str:
     """Formats the DemoPipelineOutput into a clean, human-readable terminal report."""
+    planned_duration = sum(s.duration_seconds for s in output.shots)
     lines = []
     lines.append("=" * 70)
     lines.append("REEL SCRIPTING AGENT — DEMO PIPELINE OUTPUT (PHASE 4A)")
@@ -153,6 +157,7 @@ def format_cli_output(output: DemoPipelineOutput) -> str:
     lines.append(f"Selected Framework:  #{output.selected_framework_id} {output.selected_framework_name}")
     lines.append(f"Framework Score:     {output.framework_score:.1f}")
     lines.append(f"Target Duration:     {output.target_duration_seconds:.1f}s")
+    lines.append(f"Planned Duration:    {planned_duration:.1f}s")
     lines.append(f"Number of Shots:     {output.shot_count}")
     lines.append(f"Generation Engine:   {output.generation_source}")
     lines.append(f"Validation Status:   {output.validation_status}")
@@ -182,7 +187,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run the Reel Scripting Agent Demo Pipeline")
     parser.add_argument("--topic", type=str, default="Junk Food", help="Topic to generate reel for (default: 'Junk Food')")
     parser.add_argument("--duration", type=float, default=45.0, help="Target duration in seconds (default: 45.0)")
-    parser.add_argument("--shots", type=int, default=5, help="Number of shots (default: 5)")
+    parser.add_argument("--shots", type=int, default=None, help="Number of shots (default: auto-derived from duration)")
     parser.add_argument("--json", action="store_true", help="Output raw JSON instead of human-readable text")
     parser.add_argument("--out", type=str, default=None, help="Optional file path to save output")
 

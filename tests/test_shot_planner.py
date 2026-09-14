@@ -335,36 +335,60 @@ def test_shot_planner():
     print(">>> Test 3 (Non-Health Topic) PASSED!\n")
 
     # -------------------------------------------------------------
-    # TEST 4: Exactly 5 Shots Required & Rejection of 6th Shot
+    # TEST 4: Dynamic Duration-Aware Shot Planning (8s, 15s, 30s, 45s)
     # -------------------------------------------------------------
-    print("--- TEST 4: Exactly 5 Shots Required & 6th Shot Rejection ---")
-    # 1. Verify default produces exactly 5 shots
-    plan_5 = planner.plan_shots(
-        reel_script=script_1,
-        topic_analysis=analysis_1,
-        framework_metadata=selection_1,
-        target_duration_seconds=45.0,
-        shot_count=5,
-        force_fallback=True
-    )
-    assert plan_5.shot_count == 5
-    assert len(plan_5.shots) == 5
+    print("--- TEST 4: Dynamic Duration-Aware Shot Planning (8s, 15s, 30s, 45s) ---")
+    
+    # 1. 8s -> 1 shot (~8.0s)
+    script_8s = writer.write_script(analysis_1, selection_1, target_duration_seconds=8.0, force_fallback=True)
+    plan_8s = planner.plan_shots(script_8s, analysis_1, selection_1, target_duration_seconds=8.0, force_fallback=True)
+    assert plan_8s.shot_count == 1, f"Expected 1 shot for 8s, got {plan_8s.shot_count}"
+    assert len(plan_8s.shots) == 1
+    assert 4.0 <= plan_8s.shots[0].duration_seconds <= 8.0
+    assert abs(plan_8s.total_duration_seconds - 8.0) <= 0.5
+    print(f"  [OK] 8s Target -> {plan_8s.shot_count} shot, {plan_8s.total_duration_seconds}s total planned")
 
-    # 2. Reject 6 shots (no sixth AI shot permitted)
+    # 2. 15s -> 2 shots (~15.0s, each 4-8s)
+    script_15s = writer.write_script(analysis_1, selection_1, target_duration_seconds=15.0, force_fallback=True)
+    plan_15s = planner.plan_shots(script_15s, analysis_1, selection_1, target_duration_seconds=15.0, force_fallback=True)
+    assert plan_15s.shot_count == 2, f"Expected 2 shots for 15s, got {plan_15s.shot_count}"
+    assert len(plan_15s.shots) == 2
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in plan_15s.shots)
+    assert abs(plan_15s.total_duration_seconds - 15.0) <= 0.5
+    print(f"  [OK] 15s Target -> {plan_15s.shot_count} shots, {plan_15s.total_duration_seconds}s total planned")
+
+    # 3. 30s -> 4 shots (~30.0s, each 4-8s)
+    script_30s = writer.write_script(analysis_1, selection_1, target_duration_seconds=30.0, force_fallback=True)
+    plan_30s = planner.plan_shots(script_30s, analysis_1, selection_1, target_duration_seconds=30.0, force_fallback=True)
+    assert plan_30s.shot_count == 4, f"Expected 4 shots for 30s, got {plan_30s.shot_count}"
+    assert len(plan_30s.shots) == 4
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in plan_30s.shots)
+    assert abs(plan_30s.total_duration_seconds - 30.0) <= 0.5
+    print(f"  [OK] 30s Target -> {plan_30s.shot_count} shots, {plan_30s.total_duration_seconds}s total planned")
+
+    # 4. 45s -> 6 shots (~45.0s, each 4-8s)
+    script_45s = writer.write_script(analysis_1, selection_1, target_duration_seconds=45.0, force_fallback=True)
+    plan_45s = planner.plan_shots(script_45s, analysis_1, selection_1, target_duration_seconds=45.0, force_fallback=True)
+    assert plan_45s.shot_count == 6, f"Expected 6 shots for 45s, got {plan_45s.shot_count}"
+    assert len(plan_45s.shots) == 6
+    assert all(4.0 <= s.duration_seconds <= 8.0 for s in plan_45s.shots)
+    assert abs(plan_45s.total_duration_seconds - 45.0) <= 1.0
+    print(f"  [OK] 45s Target -> {plan_45s.shot_count} shots, {plan_45s.total_duration_seconds}s total planned")
+
+    # 5. Invalid shot count rejected (< 1)
     try:
-        planner.plan_shots(script_1, shot_count=6, force_fallback=True)
-        assert False, "Should reject shot_count=6"
+        planner.plan_shots(script_1, shot_count=0, force_fallback=True)
+        assert False, "Should reject shot_count=0"
     except ValueError as e:
-        print(f"  [OK] shot_count=6 rejected: {e}")
+        print(f"  [OK] shot_count=0 rejected: {e}")
 
-    # 3. Reject 4 shots (must be exactly 5)
     try:
-        planner.plan_shots(script_1, shot_count=4, force_fallback=True)
-        assert False, "Should reject shot_count=4"
+        planner.plan_shots(script_1, shot_count=-1, force_fallback=True)
+        assert False, "Should reject shot_count=-1"
     except ValueError as e:
-        print(f"  [OK] shot_count=4 rejected: {e}")
+        print(f"  [OK] shot_count=-1 rejected: {e}")
 
-    print(">>> Test 4 (Locked 5-Shot Architecture & 6th Shot Rejection) PASSED!\n")
+    print(">>> Test 4 (Dynamic Duration-Aware Shot Planning) PASSED!\n")
 
     # -------------------------------------------------------------
     # TEST 5: Deterministic Fallback & Validation Status

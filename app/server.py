@@ -37,7 +37,7 @@ DEMO_RUN: Dict[str, Any] = {
 class PipelineRequest(BaseModel):
     topic: str = Field("Junk Food", description="Topic for the reel.")
     target_duration_seconds: float = Field(45.0, description="Target duration in seconds.")
-    shot_count: int = Field(5, description="Number of shots to plan (strictly 5).")
+    shot_count: Optional[int] = Field(None, description="Number of shots to plan (optional; derived dynamically from duration).")
     feedback: Optional[str] = Field(None, description="Optional revision feedback for plan regeneration.")
 
 
@@ -82,8 +82,8 @@ def run_custom_pipeline(req: PipelineRequest):
     """Runs the pipeline for a specified topic, duration, shot count, and optional feedback."""
     if not req.topic or not req.topic.strip():
         raise HTTPException(status_code=400, detail="Topic must not be empty.")
-    if req.shot_count != 5:
-        raise HTTPException(status_code=400, detail="Locked reel architecture requires exactly 5 shots.")
+    if req.shot_count is not None and req.shot_count < 1:
+        raise HTTPException(status_code=400, detail="shot_count must be at least 1.")
     
     try:
         output = run_demo_pipeline(
@@ -95,6 +95,7 @@ def run_custom_pipeline(req: PipelineRequest):
         DEMO_RUN["plan"] = output
         DEMO_RUN["topic"] = output.original_topic
         DEMO_RUN["approved"] = False
+        DEMO_RUN["uploaded_shots"] = {}
         DEMO_RUN["rendered_output"] = None
         return output
     except Exception as e:
@@ -112,7 +113,7 @@ def approve_plan(req: ApprovalRequest):
         DEMO_RUN["topic"] = req.topic.strip()
         # If plan not yet cached, generate default demo plan
         if DEMO_RUN["plan"] is None:
-            DEMO_RUN["plan"] = run_demo_pipeline(topic=req.topic.strip(), target_duration_seconds=45.0, shot_count=5)
+            DEMO_RUN["plan"] = run_demo_pipeline(topic=req.topic.strip(), target_duration_seconds=45.0)
         return ApprovalResponse(
             status="approved",
             message="Plan approved — ready for video generation.",
@@ -128,12 +129,14 @@ def approve_plan(req: ApprovalRequest):
 
 @app.post("/api/upload")
 async def upload_shot_clip(
-    shot_number: int = Form(..., description="Shot number from 1 to 5."),
+    shot_number: int = Form(..., description="Shot number from 1 to N."),
     file: UploadFile = File(..., description="Generated video file for this shot."),
 ):
-    """Uploads an externally generated video clip for a specific shot (1 to 5)."""
-    if shot_number not in range(1, 6):
-        raise HTTPException(status_code=400, detail=f"shot_number must be between 1 and 5, got {shot_number}.")
+    """Uploads an externally generated video clip for a specific shot."""
+    plan = DEMO_RUN.get("plan")
+    expected_total = len(plan.shots) if plan else 10
+    if shot_number < 1 or shot_number > expected_total:
+        raise HTTPException(status_code=400, detail=f"shot_number must be between 1 and {expected_total}, got {shot_number}.")
     
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
@@ -161,7 +164,7 @@ async def upload_shot_clip(
     }
     
     uploaded_count = len(DEMO_RUN["uploaded_shots"])
-    all_uploaded = uploaded_count == 5
+    all_uploaded = (uploaded_count >= expected_total) and all(i in DEMO_RUN["uploaded_shots"] for i in range(1, expected_total + 1))
     
     return {
         "success": True,
@@ -170,6 +173,7 @@ async def upload_shot_clip(
         "saved_as": save_filename,
         "file_size": len(content),
         "uploaded_count": uploaded_count,
+        "total_shots": expected_total,
         "all_uploaded": all_uploaded,
         "ready_to_render": DEMO_RUN.get("approved", False) and all_uploaded,
         "message": f"Shot {shot_number} video uploaded successfully."
@@ -178,10 +182,12 @@ async def upload_shot_clip(
 
 @app.get("/api/upload/status")
 def get_upload_status():
-    """Returns the current upload status of all 5 shots and rendering readiness."""
+    """Returns the current upload status of all planned shots and rendering readiness."""
+    plan = DEMO_RUN.get("plan")
+    total_shots = len(plan.shots) if plan else 5
     uploaded_shots = DEMO_RUN.get("uploaded_shots", {})
     uploaded_dict = {}
-    for i in range(1, 6):
+    for i in range(1, total_shots + 1):
         if i in uploaded_shots:
             item = uploaded_shots[i]
             uploaded_dict[str(i)] = {
@@ -197,11 +203,12 @@ def get_upload_status():
             }
     
     count = sum(1 for v in uploaded_dict.values() if v["uploaded"])
-    all_up = count == 5
+    all_up = (count == total_shots) and total_shots > 0
     is_appr = DEMO_RUN.get("approved", False)
     
     return {
         "approved": is_appr,
+        "total_shots": total_shots,
         "uploaded_shots": uploaded_dict,
         "uploaded_count": count,
         "all_uploaded": all_up,
@@ -212,29 +219,29 @@ def get_upload_status():
 
 @app.post("/api/render", response_model=RenderResponse)
 def render_final_reel():
-    """Assembles the 5 uploaded clips in shot order (1 -> 5) with burned captions into the final MP4."""
+    """Assembles the uploaded clips in sequential shot order with burned captions into the final MP4."""
     if not DEMO_RUN.get("approved"):
         raise HTTPException(status_code=400, detail="Plan must be approved before rendering.")
     
+    plan = DEMO_RUN.get("plan")
+    if plan is None:
+        plan = run_demo_pipeline(topic=DEMO_RUN.get("topic", "Junk Food"), target_duration_seconds=45.0)
+        DEMO_RUN["plan"] = plan
+    
+    total_shots = len(plan.shots)
     uploaded = DEMO_RUN.get("uploaded_shots", {})
-    missing_shots = [i for i in range(1, 6) if i not in uploaded or not os.path.exists(uploaded[i]["path"])]
+    missing_shots = [i for i in range(1, total_shots + 1) if i not in uploaded or not os.path.exists(uploaded[i]["path"])]
     if missing_shots:
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot render reel: missing video clips for shots: {missing_shots}. All 5 shots must be uploaded."
+            detail=f"Cannot render reel: missing video clips for shots: {missing_shots}. All {total_shots} shots must be uploaded."
         )
     
-    # Ensure plan is loaded
-    plan = DEMO_RUN.get("plan")
-    if plan is None:
-        plan = run_demo_pipeline(topic=DEMO_RUN.get("topic", "Junk Food"), target_duration_seconds=45.0, shot_count=5)
-        DEMO_RUN["plan"] = plan
-    
-    # Sequential clip paths preserving strict order 1 -> 5
-    clip_paths = [uploaded[i]["path"] for i in range(1, 6)]
+    # Sequential clip paths preserving strict order 1 -> total_shots
+    clip_paths = [uploaded[i]["path"] for i in range(1, total_shots + 1)]
     
     try:
-        assembler = VideoAssembler(target_width=720, target_height=1280, target_duration_seconds=45.0)
+        assembler = VideoAssembler(target_width=720, target_height=1280, target_duration_seconds=plan.target_duration_seconds)
         inspected = assembler.inspect_clips(clip_paths)
         actual_durations = [c.duration_seconds for c in inspected]
         
@@ -880,7 +887,7 @@ def get_ui():
     <header>
       <div class="header-badge">Reel Scripting Agent</div>
       <h1>Human-in-the-Loop Reel Finalization</h1>
-      <p class="subtitle">Plan 5 shots → Copy prompts to Google Flow → Upload generated clips → FFmpeg Finalization.</p>
+      <p class="subtitle">Plan dynamic shots → Copy prompts to Google Flow → Upload generated clips → FFmpeg Finalization.</p>
       <div class="flow-steps">
         <div class="flow-step">1. Topic Analysis</div>
         <div class="flow-arrow">→</div>
@@ -888,7 +895,7 @@ def get_ui():
         <div class="flow-arrow">→</div>
         <div class="flow-step">3. Script Writing</div>
         <div class="flow-arrow">→</div>
-        <div class="flow-step active" id="stepPlan">4. 5-Shot Planning & Review</div>
+        <div class="flow-step active" id="stepPlan">4. Shot Planning & Review</div>
         <div class="flow-arrow">→</div>
         <div class="flow-step" id="stepFinalize">5. Clip Upload & Final Reel</div>
       </div>
@@ -903,13 +910,13 @@ def get_ui():
           <label for="topicInput">Reel Topic</label>
           <input id="topicInput" type="text" value="Junk Food" placeholder="Enter topic (e.g. Junk Food, Why do legs cramp at night?)" />
         </div>
-        <div class="field" style="max-width: 140px;">
-          <label for="durationInput">Target Duration</label>
-          <input id="durationInput" type="number" value="45" min="15" max="60" />
+        <div class="field" style="max-width: 160px;">
+          <label for="durationInput">Target Duration (s)</label>
+          <input id="durationInput" type="number" value="45" min="5" max="90" oninput="updateShotsPreview()" />
         </div>
-        <div class="field" style="max-width: 120px;">
-          <label for="shotsInput">Shots (Locked)</label>
-          <input id="shotsInput" type="number" value="5" min="5" max="5" readonly disabled style="opacity: 0.7;" />
+        <div class="field" style="max-width: 160px;">
+          <label for="shotsInput">Planned Shots</label>
+          <input id="shotsInput" type="text" value="6 shots (auto)" readonly disabled style="opacity: 0.9; font-weight: 700; color: var(--primary);" />
         </div>
         <button id="generateBtn" class="btn btn-primary" onclick="generatePlan()">
           <span>Generate Reel Plan</span>
@@ -918,10 +925,10 @@ def get_ui():
     </div>
 
     <div id="statusDiv" class="status-msg">
-      Click <strong>"Generate Reel Plan"</strong> to run the agent pipeline and inspect all 5 shots.
+      Click <strong>"Generate Reel Plan"</strong> to run the agent pipeline and inspect your structured shot plan.
     </div>
 
-    <!-- Step 2: 5-Shot Plan Results Display -->
+    <!-- Step 2: Shot Plan Results Display -->
     <div id="resultsDiv" style="display: none;"></div>
 
     <!-- Step 3: Review, Feedback & Approval Section -->
@@ -947,7 +954,7 @@ def get_ui():
         <div class="approval-banner-icon">✓</div>
         <div class="approval-banner-text">
           <div class="approval-banner-title">Plan approved — ready for video generation.</div>
-          <p class="approval-banner-sub">The 5-shot reel plan and visual prompts are approved. Scroll down to the Video Generation & Upload section below.</p>
+          <p class="approval-banner-sub">The reel plan and visual prompts are approved. Scroll down to the Video Generation & Upload section below.</p>
         </div>
       </div>
     </div>
@@ -956,10 +963,10 @@ def get_ui():
     <div id="uploadSection" class="upload-section">
       <div class="upload-section-header">
         <h3 class="upload-section-title">Video Generation & Upload</h3>
-        <span class="upload-tracker-badge" id="uploadTrackerBadge">0 / 5 Uploaded</span>
+        <span class="upload-tracker-badge" id="uploadTrackerBadge">0 / 0 Uploaded</span>
       </div>
-      <p class="upload-instructions">
-        For each shot, copy the generated prompt into Google Flow / Veo 3.1 Lite. Once generated, upload each video clip (.mp4) below. When all 5 clips are uploaded, the <strong>"Render Final Reel"</strong> button will enable.
+      <p class="upload-instructions" id="uploadInstructionsText">
+        For each shot, copy the generated prompt into Google Flow / Veo 3.1 Lite. Once generated, upload each video clip (.mp4) below. When all clips are uploaded, the <strong>"Render Final Reel"</strong> button will enable.
       </p>
 
       <div id="uploadShotsList"></div>
@@ -968,8 +975,8 @@ def get_ui():
         <button id="renderReelBtn" class="btn btn-accent" disabled onclick="renderFinalReel()" style="padding: 12px 28px; font-size: 1.05rem;">
           <span>Render Final Reel</span>
         </button>
-        <div id="renderHelperNote" class="render-note">Please upload all 5 video clips to enable rendering (0/5 uploaded).</div>
-        <div id="renderingStatus" style="display:none;" class="status-msg">Assembling 5 clips with FFmpeg & burning approved captions...</div>
+        <div id="renderHelperNote" class="render-note">Please upload all video clips to enable rendering.</div>
+        <div id="renderingStatus" style="display:none;" class="status-msg">Assembling clips with FFmpeg & burning approved captions...</div>
       </div>
 
       <!-- Step 5: Final Reel Output Player & Download Link -->
@@ -995,7 +1002,26 @@ def get_ui():
 
   <script>
     let currentPlanData = null;
-    let uploadedShots = { 1: false, 2: false, 3: false, 4: false, 5: false };
+    let uploadedShots = {};
+
+    function getRecommendedShots(sec) {
+      const t = parseFloat(sec) || 45.0;
+      if (t <= 10.0) return 1;
+      if (t <= 20.0) return 2;
+      if (t <= 26.0) return 3;
+      if (t <= 36.0) return 4;
+      if (t <= 42.0) return 5;
+      if (t <= 50.0) return 6;
+      return Math.max(6, Math.round(t / 7.5));
+    }
+
+    function updateShotsPreview() {
+      const d = parseFloat(document.getElementById("durationInput").value) || 45.0;
+      const s = getRecommendedShots(d);
+      document.getElementById("shotsInput").value = `${s} shot${s === 1 ? '' : 's'} (auto)`;
+    }
+
+    window.addEventListener("DOMContentLoaded", updateShotsPreview);
 
     async function generatePlan() {
       const topic = document.getElementById("topicInput").value.trim();
@@ -1020,7 +1046,8 @@ def get_ui():
       btn.disabled = true;
       btn.innerText = "Running Pipeline...";
       statusDiv.style.display = "block";
-      statusDiv.innerText = "Running Topic Analyzer → Framework Selector → Script Writer → Shot Planner (5 shots)...";
+      const expectedShots = getRecommendedShots(duration);
+      statusDiv.innerText = `Running Topic Analyzer → Framework Selector → Script Writer → Shot Planner (${expectedShots} shots)...`;
       resultsDiv.style.display = "none";
       reviewCard.style.display = "none";
       approvalBanner.style.display = "none";
@@ -1034,7 +1061,7 @@ def get_ui():
           body: JSON.stringify({
             topic: topic,
             target_duration_seconds: duration,
-            shot_count: 5,
+            shot_count: null,
             feedback: null
           })
         });
@@ -1046,6 +1073,7 @@ def get_ui():
 
         const data = await response.json();
         currentPlanData = data;
+        uploadedShots = {};
         renderResults(data);
 
         statusDiv.style.display = "none";
@@ -1084,7 +1112,7 @@ def get_ui():
           body: JSON.stringify({
             topic: topic,
             target_duration_seconds: duration,
-            shot_count: 5,
+            shot_count: null,
             feedback: feedback || null
           })
         });
@@ -1096,6 +1124,7 @@ def get_ui():
 
         const data = await response.json();
         currentPlanData = data;
+        uploadedShots = {};
         renderResults(data);
 
         if (feedback) {
@@ -1161,6 +1190,8 @@ def get_ui():
         feedbackHtml = `<div class="feedback-applied-tag">Active Feedback: "${escapeHtml(data.feedback)}"</div>`;
       }
 
+      const totalPlanned = data.shots.reduce((acc, s) => acc + s.duration_seconds, 0).toFixed(1);
+
       let html = `
         <div class="summary-card">
           <div class="meta-grid">
@@ -1177,8 +1208,8 @@ def get_ui():
               <div class="meta-value">${data.framework_score.toFixed(1)}</div>
             </div>
             <div class="meta-item">
-              <div class="meta-label">Target Duration</div>
-              <div class="meta-value">${data.target_duration_seconds}s (5 shots)</div>
+              <div class="meta-label">Duration & Shots</div>
+              <div class="meta-value">Target: ${data.target_duration_seconds}s | Planned: ${totalPlanned}s (${data.shot_count} shots)</div>
             </div>
           </div>
           ${feedbackHtml}
@@ -1189,8 +1220,8 @@ def get_ui():
         </div>
 
         <div class="shots-header">
-          <h2 class="shots-title">Structured 5-Shot Plan for Google Flow / Veo 3.1 Lite</h2>
-          <span class="shots-count-badge">Exactly 5 Shots (Each &le; 8.0s)</span>
+          <h2 class="shots-title">Structured Shot Plan for Google Flow / Veo 3.1 Lite</h2>
+          <span class="shots-count-badge">${data.shot_count} Shots (Each in [4.0s, 8.0s])</span>
         </div>
       `;
 
@@ -1202,7 +1233,7 @@ def get_ui():
                 <div class="shot-number-badge">${shot.shot_number}</div>
                 <div class="shot-title">Shot ${shot.shot_number}: ${escapeHtml(shot.stage)}</div>
               </div>
-              <div class="shot-duration-badge">${shot.duration_seconds}s &le; 8.0s</div>
+              <div class="shot-duration-badge">${shot.duration_seconds}s (in [4.0s, 8.0s])</div>
             </div>
             
             <div class="field-row">
@@ -1232,6 +1263,13 @@ def get_ui():
     function renderUploadCards(data) {
       const listDiv = document.getElementById("uploadShotsList");
       let html = "";
+      const totalShots = data.shots.length;
+
+      data.shots.forEach((shot) => {
+        if (uploadedShots[shot.shot_number] === undefined) {
+          uploadedShots[shot.shot_number] = false;
+        }
+      });
 
       data.shots.forEach((shot) => {
         const isUp = uploadedShots[shot.shot_number];
@@ -1255,7 +1293,7 @@ def get_ui():
 
             <div class="upload-control-row">
               <label for="shotFileInput-${shot.shot_number}" class="btn btn-secondary upload-file-btn">
-                <span>📁 Choose Clip (${shot.shot_number}/5)</span>
+                <span>📁 Choose Clip (${shot.shot_number}/${totalShots})</span>
               </label>
               <input type="file" id="shotFileInput-${shot.shot_number}" accept="video/mp4,video/*,.mp4,.mov,.webm" style="display:none;" onchange="handleFileSelect(${shot.shot_number}, this.files[0])">
               <span id="uploadFileName-${shot.shot_number}" style="font-size: 0.85rem; color: var(--muted);">No file chosen</span>
@@ -1306,26 +1344,31 @@ def get_ui():
     }
 
     function updateUploadTracker() {
-      const count = Object.values(uploadedShots).filter(Boolean).length;
+      if (!currentPlanData) return;
+      const totalShots = currentPlanData.shots.length;
+      let count = 0;
+      for (let i = 1; i <= totalShots; i++) {
+        if (uploadedShots[i]) count++;
+      }
       const trackerBadge = document.getElementById("uploadTrackerBadge");
       const renderBtn = document.getElementById("renderReelBtn");
       const renderNote = document.getElementById("renderHelperNote");
 
-      trackerBadge.innerText = `${count} / 5 Uploaded`;
+      trackerBadge.innerText = `${count} / ${totalShots} Uploaded`;
 
-      if (count === 5) {
+      if (count === totalShots && totalShots > 0) {
         trackerBadge.style.background = "var(--accent-dim)";
         trackerBadge.style.color = "var(--accent)";
         trackerBadge.style.borderColor = "var(--accent)";
         renderBtn.disabled = false;
-        renderNote.innerText = "✓ All 5 clips uploaded. Ready to assemble the final reel!";
+        renderNote.innerText = `✓ All ${totalShots} clips uploaded. Ready to assemble the final reel!`;
         renderNote.style.color = "var(--accent)";
       } else {
         trackerBadge.style.background = "rgba(56, 189, 248, 0.15)";
         trackerBadge.style.color = "var(--primary)";
         trackerBadge.style.borderColor = "rgba(56, 189, 248, 0.3)";
         renderBtn.disabled = true;
-        renderNote.innerText = `Please upload all 5 video clips to enable rendering (${count}/5 uploaded).`;
+        renderNote.innerText = `Please upload all ${totalShots} video clips to enable rendering (${count}/${totalShots} uploaded).`;
         renderNote.style.color = "var(--muted)";
       }
     }
@@ -1341,6 +1384,8 @@ def get_ui():
 
       renderBtn.disabled = true;
       renderBtn.innerText = "Assembling Reel...";
+      const numClips = currentPlanData ? currentPlanData.shots.length : "";
+      renderingStatus.innerText = `Assembling ${numClips} clips with FFmpeg & burning approved captions...`;
       renderingStatus.style.display = "block";
       finalContainer.style.display = "none";
 

@@ -280,20 +280,12 @@ class ScriptWriter:
         feedback: Optional[str] = None
     ) -> ReelScript:
         """Main generation entry point. Strictly adheres to selected framework stages
-        and target duration (default ~45 seconds, configurable)."""
+        and target duration (scales word count appropriately for any duration)."""
         if target_duration_seconds <= 0:
             raise ValueError("target_duration_seconds must be greater than zero.")
 
         # Re-check environment in case keys were loaded dynamically
         self._refresh_api_keys()
-        # For the canonical demo topic 'Junk Food', guarantee the approved benchmark narration unless specific feedback is provided
-        topic_clean = topic_analysis.original_topic.strip().lower()
-        if (
-            not feedback
-            and topic_clean in ["junk food", "what happens if you eat junk food every single day?"]
-            and framework_selection.selected_framework_id == 15
-        ):
-            return self._generate_deterministic(topic_analysis, framework_selection, target_duration_seconds)
 
         # 1. Attempt LLM generation if free API key is configured and fallback is not forced
         if not force_fallback and self.groq_api_key:
@@ -305,7 +297,10 @@ class ScriptWriter:
                     feedback=feedback
                 )
                 if llm_script:
-                    return llm_script
+                    # Verify LLM respected the duration pacing constraint (< 2.8 words/sec max)
+                    total_words = len(llm_script.full_script_with_cta.split())
+                    if total_words <= max(24, int(target_duration_seconds * 2.8)):
+                        return llm_script
             except Exception as e:
                 # Sanitize error to prevent accidental API key leakage
                 sanitized_msg = re.sub(r"gsk_[a-zA-Z0-9_\-]+", "[REDACTED_API_KEY]", str(e))
@@ -324,7 +319,7 @@ class ScriptWriter:
                 if raise_on_llm_error:
                     raise RuntimeError(self.last_llm_error) from e
 
-        # 2. Deterministic Fallback Generator
+        # 2. Deterministic Fallback Generator (fully duration-aware)
         return self._generate_deterministic(topic_analysis, framework_selection, target_duration_seconds)
 
     def _generate_deterministic(
@@ -335,86 +330,186 @@ class ScriptWriter:
     ) -> ReelScript:
         """Deterministic, rule-based script writer that dynamically builds
         script sections according to the exact stage sequence of the selected framework,
-        using careful, evidence-based medical phrasing."""
+        scaled appropriately to the requested target duration and natural speaking pace."""
         fw_id = selection.selected_framework_id
         fw_name = selection.selected_framework_name
         stages = selection.stage_details  # List of {"order": int, "name": str, "description": str}
         topic = analysis.original_topic
+        topic_lower = topic.lower()
 
         sections: List[ScriptSection] = []
-        cta_text = "Save this reel for your next grocery run!" if "food" in topic.lower() else "Share this reel with someone who needs to hear it today."
+        cta_text = "Save this reel for your next grocery run!" if "food" in topic_lower else "Share this reel with someone who needs to hear it today."
 
-        # Specialized high-fidelity templates for key demo frameworks
+        # Speaking pace: ~2.2 words per second
+        target_words = max(14, int(duration * 2.2))
+        cta_words = len(cta_text.split())
+        body_words = max(8, target_words - cta_words)
+        num_stages = max(1, len(stages))
+
+        # Specialized high-fidelity templates for key demo frameworks, scaled to duration
         if fw_id == 15:  # What Happens If
-            # Stage 1: What happens if
-            s1_text = "What happens if you eat junk food every single day?"
-            # Stage 2: Explanation
-            s2_text = (
-                "Highly processed ingredients can trigger rapid blood sugar fluctuations. "
-                "This forces your pancreas to work harder to release insulin, which may contribute to insulin resistance over time. "
-                "Additionally, low fiber intake can slow digestion, leading to bloating and inconsistent energy levels throughout the day."
-            )
-            # Stage 3: Prevention
-            s3_text = (
-                "Try swapping one processed snack for whole foods like fruit or nuts to stabilize your energy. "
-                "If you notice persistent digestive issues or unexplained fatigue, please consult a physician in person for a proper evaluation."
-            )
+            topic_subject = "junk food" if "junk" in topic_lower or "food" in topic_lower else topic
+            if duration <= 10.0:
+                s1_text = f"What happens if you eat {topic_subject} daily?"
+                s2_text = "Fast glucose spikes strain digestion."
+                s3_text = "Swap snacks for whole foods."
+            elif duration <= 20.0:
+                s1_text = f"What happens if you eat {topic_subject} daily?"
+                s2_text = f"Processed {topic_subject} triggers sharp blood sugar spikes and strains metabolic balance."
+                s3_text = "Swap snacks for fresh fruit or nuts. If fatigue persists, consult a doctor."
+            elif duration <= 35.0:
+                s1_text = f"What happens if you eat {topic_subject} daily?"
+                s2_text = (
+                    f"Highly processed {topic_subject} triggers rapid blood sugar fluctuations, forcing your pancreas to release excess insulin. "
+                    "Low fiber intake also slows digestion and leads to inconsistent daily energy."
+                )
+                s3_text = (
+                    "Try swapping processed snacks for whole foods like fruit or nuts to stabilize your energy. "
+                    "If persistent digestive discomfort or fatigue continues, consult a physician in person."
+                )
+            else:
+                # 40s+ (e.g. 45s benchmark)
+                s1_text = f"What happens if you eat {topic_subject} every single day?"
+                s2_text = (
+                    "Highly processed ingredients can trigger rapid blood sugar fluctuations. "
+                    "This forces your pancreas to work harder to release insulin, which may contribute to insulin resistance over time. "
+                    "Additionally, low fiber intake can slow digestion, leading to bloating and inconsistent energy levels throughout the day."
+                )
+                s3_text = (
+                    "Try swapping one processed snack for whole foods like fruit or nuts to stabilize your energy. "
+                    "If you notice persistent digestive issues or unexplained fatigue, please consult a physician in person for a proper evaluation."
+                )
             stage_texts = [s1_text, s2_text, s3_text]
 
         elif fw_id == 8:  # Myth, Truth, Explanation
-            s1_text = "People often believe that having curd at night causes an immediate cold and congestion."
-            s2_text = "Curd does not cause a cold; respiratory infections are caused by viruses."
-            s3_text = (
-                "This belief often stems from chilled foods temporarily thickening throat sensations in people who already have "
-                "mild underlying congestion. For healthy individuals, curd provides dietary protein and probiotics and is generally "
-                "well-tolerated at night. If cold symptoms or sinus congestion persist for more than a week, consult a physician in person."
-            )
+            if duration <= 12.0:
+                s1_text = f"Myth: {topic} causes colds."
+                s2_text = "Truth: Viruses cause colds, not food."
+                s3_text = "Nutrient-dense foods support recovery."
+            elif duration <= 25.0:
+                s1_text = f"Does {topic} cause an immediate cold?"
+                s2_text = "Respiratory infections are caused by viruses, not food temperature."
+                s3_text = "Chilled sensations can feel noticeable, but food provides protein. If symptoms persist, consult a doctor."
+            else:
+                s1_text = "People often believe that having curd at night causes an immediate cold and congestion."
+                s2_text = "Curd does not cause a cold; respiratory infections are caused by viruses."
+                s3_text = (
+                    "This belief often stems from chilled foods temporarily thickening throat sensations in people who already have "
+                    "mild underlying congestion. For healthy individuals, curd provides dietary protein and probiotics and is generally "
+                    "well-tolerated at night. If cold symptoms or sinus congestion persist for more than a week, consult a physician in person."
+                )
             stage_texts = [s1_text, s2_text, s3_text]
 
         elif fw_id == 16:  # 3 Signs
-            s1_text = "Three signs that may suggest your liver is under metabolic strain."
-            s2_text = "First: persistent sluggishness and low energy after meals. Second: noticeable morning puffiness around the eyes. Third: chronic digestive discomfort accompanied by unusually dark urine or pale stools."
-            s3_text = "Having several of these signs together does not diagnose a condition, but indicates it may be time to evaluate your metabolic health."
-            s4_text = "Avoid unverified detox cleanses. If these symptoms continue for more than two weeks, consult a physician in person for routine liver tests."
+            if duration <= 12.0:
+                s1_text = f"Signs of stress in {topic}."
+                s2_text = "Persistent sluggishness and unusual digestive fatigue."
+                s3_text = "These signs suggest evaluating metabolic health."
+                s4_text = "If symptoms persist, consult a doctor."
+            elif duration <= 25.0:
+                s1_text = f"Two signs your {topic} is under metabolic strain."
+                s2_text = "First: lingering post-meal sluggishness. Second: chronic digestive discomfort."
+                s3_text = "These signs suggest reviewing your lifestyle and metabolic habits."
+                s4_text = "Avoid extreme detoxes. If fatigue continues for weeks, consult a physician."
+            else:
+                s1_text = "Three signs that may suggest your liver is under metabolic strain."
+                s2_text = "First: persistent sluggishness and low energy after meals. Second: noticeable morning puffiness around the eyes. Third: chronic digestive discomfort accompanied by unusually dark urine or pale stools."
+                s3_text = "Having several of these signs together does not diagnose a condition, but indicates it may be time to evaluate your metabolic health."
+                s4_text = "Avoid unverified detox cleanses. If these symptoms continue for more than two weeks, consult a physician in person for routine liver tests."
             stage_texts = [s1_text, s2_text, s3_text, s4_text]
 
         elif fw_id == 6:  # Hook, Explanation, CTA
-            s1_text = "Why do calf muscle cramps often happen during the night?"
-            s2_text = (
-                "During sleep, reduced blood circulation combined with prolonged muscle shortening can increase muscle irritability. "
-                "Factors like mild dehydration, low magnesium intake, or physical fatigue can contribute to involuntary cramping."
-            )
-            s3_text = "Staying hydrated and gently stretching your calves before bed can help. If painful muscle cramps occur frequently or disrupt your sleep regularly, see your doctor to check electrolyte levels."
+            if duration <= 12.0:
+                s1_text = f"Why does {topic} happen?"
+                s2_text = "Muscle tightening and low hydration can trigger cramping."
+                s3_text = "Stay hydrated and stretch gently before sleep."
+            elif duration <= 25.0:
+                s1_text = f"Why do muscle cramps often happen during {topic}?"
+                s2_text = "During rest, reduced circulation and mild dehydration can increase muscle irritability."
+                s3_text = "Gentle stretching and hydration help. If cramps disrupt sleep regularly, see your doctor."
+            else:
+                s1_text = "Why do calf muscle cramps often happen during the night?"
+                s2_text = (
+                    "During sleep, reduced blood circulation combined with prolonged muscle shortening can increase muscle irritability. "
+                    "Factors like mild dehydration, low magnesium intake, or physical fatigue can contribute to involuntary cramping."
+                )
+                s3_text = "Staying hydrated and gently stretching your calves before bed can help. If painful muscle cramps occur frequently or disrupt your sleep regularly, see your doctor to check electrolyte levels."
             stage_texts = [s1_text, s2_text, s3_text]
 
         elif fw_id == 11:  # Normal vs Red Flag
-            s1_text = "A mild fever lasting two or three days with general body tiredness is common with simple viral illnesses and often improves with rest and fluids."
-            s2_text = "However, signs like unexplained bleeding, severe unremitting abdominal pain, persistent vomiting, or difficulty breathing are critical red flags."
-            s3_text = "These warning signs require prompt evaluation. Go to an emergency clinic or hospital promptly rather than waiting at home."
+            if duration <= 15.0:
+                s1_text = f"Mild symptoms from {topic} usually improve with rest."
+                s2_text = "Severe unremitting pain or difficulty breathing are critical red flags."
+                s3_text = "For red flags, seek medical evaluation promptly."
+            else:
+                s1_text = "A mild fever lasting two or three days with general body tiredness is common with simple viral illnesses and often improves with rest and fluids."
+                s2_text = "However, signs like unexplained bleeding, severe unremitting abdominal pain, persistent vomiting, or difficulty breathing are critical red flags."
+                s3_text = "These warning signs require prompt evaluation. Go to an emergency clinic or hospital promptly rather than waiting at home."
             stage_texts = [s1_text, s2_text, s3_text]
 
         else:
-            # Universal Dynamic Framework Synthesizer for arbitrary frameworks (1 to 30)
+            # Universal Dynamic Framework Synthesizer for arbitrary frameworks (1 to 30), scaled to duration
             stage_texts = []
             for idx, stage in enumerate(stages, 1):
                 st_name = stage["name"]
                 st_desc = stage["description"]
-                
+
                 if idx == 1:
                     # Opening Hook
-                    txt = f"{stage['name']}: Here is what medical evidence shows about {topic}."
+                    if duration <= 10.0:
+                        txt = f"The truth about {topic}."
+                    elif duration <= 20.0:
+                        txt = f"How does {topic} affect your body daily?"
+                    elif duration <= 35.0:
+                        txt = f"Here is what medical evidence shows about {topic}."
+                    else:
+                        txt = f"{st_name}: Here is what medical evidence shows about {topic}."
                 elif idx == len(stages):
                     # Closing Stage with consultation recommendation
-                    txt = (
-                        f"{stage['name']}: Focus on sustainable daily habits rather than extreme measures. "
-                        f"If your symptoms persist, worsen, or cause concern, always schedule an in-person clinical consultation with a doctor."
-                    )
+                    if duration <= 10.0:
+                        txt = "Build consistent habits. Consult a doctor."
+                    elif duration <= 20.0:
+                        txt = "Focus on sustainable daily routines. For persistent concerns, consult a doctor in person."
+                    elif duration <= 35.0:
+                        txt = "Focus on sustainable daily habits. If symptoms persist or worsen, consult a physician in person."
+                    else:
+                        txt = (
+                            f"{st_name}: Focus on sustainable daily habits rather than extreme measures. "
+                            f"If your symptoms persist, worsen, or cause concern, always schedule an in-person clinical consultation with a doctor."
+                        )
                 else:
                     # Intermediate Educational Mechanism
-                    txt = (
-                        f"{stage['name']}: {st_desc} Inside the body, {topic} can influence your metabolic markers and overall energy levels over time. "
-                        f"Long-term consistency is what creates meaningful physiological improvements."
-                    )
+                    st_lower = st_name.lower()
+                    if any(k in st_lower for k in ["problem", "mistake", "cause", "issue"]):
+                        if duration <= 10.0:
+                            txt = f"Inactivity affects daily health."
+                        elif duration <= 20.0:
+                            txt = f"Without regular movement, energy and circulation decline."
+                        elif duration <= 35.0:
+                            txt = f"Inside the body, sedentary habits reduce metabolic efficiency and physical stamina."
+                        else:
+                            txt = f"{st_name}: {st_desc} Without regular movement, metabolic efficiency and stamina decline over time."
+                    elif any(k in st_lower for k in ["solution", "fix", "remedy", "habit", "action", "treatment"]):
+                        if duration <= 10.0:
+                            txt = f"Gentle daily movement helps."
+                        elif duration <= 20.0:
+                            txt = f"Adding moderate movement or brisk walks restores balance."
+                        elif duration <= 35.0:
+                            txt = f"Consistent moderate exercise and daily steps help stabilize cardiovascular health."
+                        else:
+                            txt = f"{st_name}: {st_desc} Consistent moderate exercise and daily steps help stabilize cardiovascular health."
+                    else:
+                        if duration <= 10.0:
+                            txt = f"{topic} directly influences health."
+                        elif duration <= 20.0:
+                            txt = f"Inside the body, {topic} influences metabolic balance and energy."
+                        elif duration <= 35.0:
+                            txt = f"Inside the body, {topic} influences metabolic balance and cardiovascular energy over time."
+                        else:
+                            txt = (
+                                f"{st_name}: {st_desc} Inside the body, {topic} can influence your metabolic markers and overall energy levels over time. "
+                                f"Long-term consistency is what creates meaningful physiological improvements."
+                            )
                 stage_texts.append(txt)
 
         # Assemble ScriptSection objects
@@ -509,7 +604,8 @@ UNIVERSAL HEALTH REEL RULES:
 6. The first 3 seconds (Stage 1) must be a punchy, scroll-stopping hook.
 
 CRITICAL CONTENT QUALITY & SCIENTIFIC ACCURACY CONSTRAINTS:
-Target Spoken Duration: ~{duration} seconds (approx {int(duration * 2.5)} words spoken naturally).
+Target Spoken Duration: ~{duration} seconds.
+TOTAL SPOKEN WORD COUNT CONSTRAINT: The combined spoken script (all sections + CTA) MUST contain approximately {int(duration * 2.2)} words (strictly between {max(12, int(duration * 1.8))} and {int(duration * 2.4)} words) so it can be spoken naturally within {duration} seconds. Do not write more words than can be spoken comfortably.
 
 CRITICAL STANDALONE CTA RULES (MANDATORY):
 1. The CTA ("cta" field) MUST be a standalone, single call-to-action (e.g. "Follow for more science-backed nutrition tips!").

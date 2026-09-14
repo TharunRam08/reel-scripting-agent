@@ -52,8 +52,8 @@ class Shot(BaseModel):
     @field_validator("duration_seconds")
     @classmethod
     def validate_duration(cls, v: float) -> float:
-        if v <= 0:
-            raise ValueError(f"duration_seconds must be positive, got {v}")
+        if v < 4.0:
+            raise ValueError(f"duration_seconds must be >= 4.0s for Google Flow / Veo 3.1 Lite minimum, got {v}")
         if v > 8.0:
             raise ValueError(f"duration_seconds must be <= 8.0s for Google Flow / Veo 3.1 Lite clip limit, got {v}")
         return round(v, 1)
@@ -84,20 +84,20 @@ class ShotPlan(BaseModel):
     framework_id: int = Field(..., description="Framework ID (1-30).")
     framework_name: str = Field(..., description="Framework name from knowledge base.")
     target_duration_seconds: float = Field(..., description="Target video duration in seconds.")
-    shot_count: int = Field(5, description="Total planned shots (locked to 5).")
+    shot_count: int = Field(..., description="Total planned shots (dynamically derived from target duration).")
     total_duration_seconds: float = Field(..., description="Sum of planned shot durations.")
     cta: str = Field(..., description="Approved single CTA from ReelScript.")
     continuity_notes: Optional[str] = Field(None, description="Visual and character continuity guidelines across shots.")
     shots: List[Shot] = Field(..., description="Sequential list of planned shots.")
     generation_source: str = Field("deterministic_fallback", description="Engine used: groq or deterministic_fallback.")
-    validation_status: str = Field("VALID (all 5 shots <= 8.0s, narration timing verified)", description="Validation status of the shot plan.")
+    validation_status: str = Field("VALID (all shots in [4.0s, 8.0s], narration timing verified)", description="Validation status of the shot plan.")
     feedback: Optional[str] = Field(None, description="Applied user revision feedback, if any.")
 
     @field_validator("shot_count")
     @classmethod
     def validate_shot_count(cls, v: int) -> int:
-        if v != 5:
-            raise ValueError(f"shot_count must be exactly 5 for locked reel architecture, got {v}")
+        if v < 1:
+            raise ValueError(f"shot_count must be at least 1, got {v}")
         return v
 
     @field_validator("target_duration_seconds")
@@ -119,17 +119,17 @@ class ShotPlan(BaseModel):
 
     @model_validator(mode="after")
     def validate_consistency_and_safety(self) -> "ShotPlan":
-        if len(self.shots) != 5:
-            raise ValueError(f"shots length ({len(self.shots)}) must be exactly 5.")
+        if len(self.shots) != self.shot_count:
+            raise ValueError(f"shots length ({len(self.shots)}) must match shot_count ({self.shot_count}).")
 
         for s in self.shots:
+            if s.duration_seconds < 4.0:
+                raise ValueError(f"Shot {s.shot_number} duration ({s.duration_seconds}s) must be >= 4.0s.")
             if s.duration_seconds > 8.0:
                 raise ValueError(f"Shot {s.shot_number} duration ({s.duration_seconds}s) exceeds the maximum 8.0s clip limit.")
 
         calc_total = sum(s.duration_seconds for s in self.shots)
         self.total_duration_seconds = round(calc_total, 1)
-        if self.total_duration_seconds > 40.0:
-            raise ValueError(f"Total planned duration ({self.total_duration_seconds}s) exceeds 40.0s for 5 shots.")
 
         # Medical safety check: ensure visuals and captions do not introduce unauthorized claims
         for s in self.shots:
@@ -258,6 +258,32 @@ def _assemble_clean_veo_prompt(
     return text
 
 
+def calculate_recommended_shot_count(target_duration_seconds: float) -> int:
+    """Derives a recommended shot count from the requested reel target duration.
+    
+    Guarantees:
+    - 8s -> 1 shot (~8.0s)
+    - 15s -> 2 shots (~15.0s, 2 x 7.5s)
+    - 30s -> 4 shots (~30.0s, 4 x 7.5s)
+    - 45s -> 6 shots (~45.0s, 6 x 7.5s)
+    - Every shot fits within Google Flow / Veo 3.1 Lite duration limits: [4.0s, 8.0s].
+    """
+    t = float(target_duration_seconds)
+    if t <= 10.0:
+        return 1
+    elif t <= 20.0:
+        return 2
+    elif t <= 26.0:
+        return 3
+    elif t <= 36.0:
+        return 4
+    elif t <= 42.0:
+        return 5
+    elif t <= 50.0:
+        return 6
+    else:
+        return max(6, int(round(t / 7.5)))
+
 
 class ShotPlanner:
     """Converts an approved ReelScript into a structured, production-ready multi-shot visual plan
@@ -271,12 +297,8 @@ class ShotPlanner:
     def __init__(self):
         self.last_llm_error: Optional[str] = None
         self.groq_model_used: Optional[str] = None
-        self._refresh_api_keys()
 
-    def _refresh_api_keys(self):
-        """Reads API keys from environment, treating empty or whitespace strings as None."""
-        if os.path.exists(_ENV_PATH):
-            load_dotenv(_ENV_PATH)
+    def _refresh_api_keys(self) -> None:
         raw_groq = os.environ.get("GROQ_API_KEY", "").strip()
         self.groq_api_key = raw_groq if raw_groq else None
 
@@ -286,7 +308,7 @@ class ShotPlanner:
         topic_analysis: Optional[TopicAnalysis] = None,
         framework_metadata: Optional[Union[FrameworkSelection, Dict[str, Any]]] = None,
         target_duration_seconds: Optional[float] = None,
-        shot_count: int = 5,
+        shot_count: Optional[int] = None,
         force_fallback: bool = False,
         raise_on_llm_error: bool = False,
         feedback: Optional[str] = None
@@ -299,12 +321,14 @@ class ShotPlanner:
         if not isinstance(reel_script, ReelScript):
             raise TypeError(f"Expected ReelScript instance, got {type(reel_script).__name__}")
 
-        if shot_count != 5:
-            raise ValueError(f"Locked reel architecture requires exactly 5 shots (got {shot_count}). Adding a sixth AI-generated shot is not permitted.")
-
         duration = target_duration_seconds or reel_script.target_duration_seconds
         if duration <= 0:
             raise ValueError(f"target_duration_seconds must be positive, got {duration}")
+
+        if shot_count is None:
+            shot_count = calculate_recommended_shot_count(duration)
+        elif shot_count < 1:
+            raise ValueError(f"shot_count must be at least 1, got {shot_count}")
 
         self._refresh_api_keys()
         self.last_llm_error = None
@@ -366,6 +390,26 @@ class ShotPlanner:
 
         total_sentences = len(sentence_items)
 
+        # Fast-path for single-shot reels (e.g. 8s duration)
+        if shot_count == 1:
+            all_text = " ".join(item["text"] for item in sentence_items)
+            first_sec = reel_script.sections[0] if reel_script.sections else None
+            primary_order = first_sec.stage_order if first_sec else 1
+            primary_name = first_sec.stage_name if first_sec else "Overview"
+            distributed = [{
+                "shot_number": 1,
+                "stage_order": primary_order,
+                "stage_name": primary_name,
+                "text": all_text
+            }]
+            if reel_script.cta and reel_script.cta.strip():
+                cta_clean = reel_script.cta.strip()
+                if distributed[0]["text"]:
+                    distributed[0]["text"] = f"{distributed[0]['text']} {cta_clean}".strip()
+                else:
+                    distributed[0]["text"] = cta_clean
+            return distributed
+
         # 2. If fewer sentences than requested shots, subdivide longer sentences on clause boundaries
         if total_sentences < shot_count:
             expanded_items = []
@@ -378,6 +422,24 @@ class ShotPlanner:
                     split_idx = clause_match.start(1) + 1
                     part1 = text[:split_idx].strip()
                     part2 = text[split_idx:].strip()
+                    expanded_items.append({"stage_order": item["stage_order"], "stage_name": item["stage_name"], "text": part1})
+                    expanded_items.append({"stage_order": item["stage_order"], "stage_name": item["stage_name"], "text": part2})
+                    needed -= 1
+                else:
+                    expanded_items.append(item)
+            sentence_items = expanded_items
+            total_sentences = len(sentence_items)
+
+        # 2b. Secondary split if still fewer sentences than shots
+        if total_sentences < shot_count:
+            expanded_items = []
+            needed = shot_count - total_sentences
+            for item in sentence_items:
+                words = item["text"].split()
+                if needed > 0 and len(words) >= 4:
+                    mid = len(words) // 2
+                    part1 = " ".join(words[:mid]).strip()
+                    part2 = " ".join(words[mid:]).strip()
                     expanded_items.append({"stage_order": item["stage_order"], "stage_name": item["stage_name"], "text": part1})
                     expanded_items.append({"stage_order": item["stage_order"], "stage_name": item["stage_name"], "text": part2})
                     needed -= 1
@@ -492,23 +554,37 @@ class ShotPlanner:
         return distributed
 
     def _calculate_durations(self, distributed_shots: List[Dict[str, Any]], target_duration: float = 45.0) -> List[float]:
-        """Calculates deterministic shot durations based on narration length.
+        """Calculates deterministic shot durations based on narration length and target duration.
 
         Rules:
-        - Exactly <= 8.0 seconds per shot (Google Flow / Veo 3.1 Lite limit).
-        - Default planned duration around 7–8 seconds per shot (total footage 35–40 seconds).
+        - Every shot duration is strictly in [4.0s, 8.0s] (Google Flow / Veo 3.1 Lite limit).
+        - Total duration closely tracks target_duration.
         - If narration cannot fit naturally in 8.0s (> 38 words), raises ValueError identifying the affected shot.
-        - Cap every duration at 8.0s.
         """
-        durations = []
+        N = len(distributed_shots)
+        if N == 0:
+            return []
+
+        if N == 1:
+            dur = min(8.0, max(4.0, round(float(target_duration), 1)))
+            text = distributed_shots[0].get("text", "").strip()
+            wc = len(text.split())
+            if wc > 38:
+                stage_name = distributed_shots[0].get("stage_name", "Unknown")
+                raise ValueError(
+                    f"Narration for Shot 1 ('{stage_name}') contains {wc} words, which cannot "
+                    f"realistically fit within the 8.0-second clip duration limit (maximum 38 words). "
+                    f"Section narration: \"{text}\""
+                )
+            return [dur]
+
+        # Check word counts and speaking rate limit
+        word_counts = []
+        min_speech_durs = []
         for idx, item in enumerate(distributed_shots):
             text = item.get("text", "").strip()
-            words = text.split()
-            wc = len(words)
-
-            # Narration timing check:
-            # Natural speaking rate in short-form voiceover allows up to ~36-38 words in 8 seconds (~4.75 words/sec).
-            # If a section exceeds 38 words, report a clear validation error identifying the affected shot/section.
+            wc = len(text.split())
+            word_counts.append(wc)
             if wc > 38:
                 stage_name = item.get("stage_name", "Unknown")
                 raise ValueError(
@@ -516,21 +592,47 @@ class ShotPlanner:
                     f"realistically fit within the 8.0-second clip duration limit (maximum 38 words). "
                     f"Section narration: \"{text}\""
                 )
+            min_speech_durs.append(max(4.0, round(wc / 3.8, 1)))
 
-            # Deterministic duration mapping based on narration length (7.0 - 8.0 seconds)
-            if wc <= 10:
-                dur = 7.0
-            elif wc <= 18:
-                dur = 7.5
-            elif wc <= 28:
-                dur = 7.8
+        # Target total clamped to physical limits for N clips [N * 4.0, N * 8.0]
+        clamped_target = min(N * 8.0, max(N * 4.0, float(target_duration)))
+        even_dur = round(clamped_target / N, 1)
+
+        # Initial allocation
+        durations = []
+        for idx in range(N):
+            base = max(even_dur, min_speech_durs[idx])
+            durations.append(min(8.0, max(4.0, round(base, 1))))
+
+        # Fine-tune to match clamped_target exactly (in 0.1s increments)
+        current_sum = round(sum(durations), 1)
+        iterations = 0
+        while round(current_sum, 1) != round(clamped_target, 1) and iterations < 200:
+            iterations += 1
+            diff = round(clamped_target - current_sum, 1)
+            step = 0.1 if diff > 0 else -0.1
+
+            best_idx = None
+            if diff > 0:
+                candidates = [i for i in range(N) if durations[i] + 0.05 < 8.0]
+                if not candidates:
+                    break
+                candidates.sort(key=lambda i: (durations[i], -word_counts[i]))
+                best_idx = candidates[0]
             else:
-                dur = 8.0
+                candidates = [i for i in range(N) if durations[i] - 0.05 > max(4.0, min_speech_durs[i])]
+                if not candidates:
+                    candidates = [i for i in range(N) if durations[i] - 0.05 > 4.0]
+                if not candidates:
+                    break
+                candidates.sort(key=lambda i: (-durations[i], word_counts[i]))
+                best_idx = candidates[0]
 
-            dur = min(8.0, max(6.0, round(dur, 1)))
-            durations.append(dur)
+            durations[best_idx] = round(durations[best_idx] + step, 1)
+            current_sum = round(sum(durations), 1)
 
-        return durations
+        # Final safety clamp
+        return [round(min(8.0, max(4.0, d)), 1) for d in durations]
 
     def _generate_deterministic(
         self,
@@ -854,7 +956,7 @@ class ShotPlanner:
             continuity_notes=continuity_notes,
             shots=shots,
             generation_source="deterministic_fallback",
-            validation_status="VALID (all 5 shots <= 8.0s, narration timing verified)",
+            validation_status=f"VALID (all {shot_count} shots in [4.0s, 8.0s], narration timing verified)",
             feedback=feedback
         )
 
@@ -887,7 +989,7 @@ class ShotPlanner:
 
             feedback_directive = ""
             if feedback and feedback.strip():
-                feedback_directive = f"\nUSER REVISION FEEDBACK TO INCORPORATE:\n\"{feedback.strip()}\"\nIncorporate this user feedback into visual goals, camera directions, and setting nuances while strictly maintaining the 5-shot structure, <=8.0s duration limit, and exact narration fidelity.\n"
+                feedback_directive = f"\nUSER REVISION FEEDBACK TO INCORPORATE:\n\"{feedback.strip()}\"\nIncorporate this user feedback into visual goals, camera directions, and setting nuances while strictly maintaining the {shot_count}-shot structure, <=8.0s duration limit, and exact narration fidelity.\n"
 
             prompt = f"""You are an award-winning Creative Director specializing in short-form medical and educational reels.
 Your job is to design the visual plan (what is SHOWN on screen) for an approved reel script suitable for Google Flow / Veo 3.1 Lite.{feedback_directive}
@@ -996,6 +1098,7 @@ Return valid JSON with:
                 dist_item = distributed_script[idx]
                 dur = calculated_durations[idx]
                 st_lower = dist_item["text"].lower()
+                is_final_shot = (idx == shot_count - 1 and idx > 0)
 
                 # User Requirement Enforcement for Specific Shots:
                 # Shot 1 (Hook): Strong human hook
@@ -1014,9 +1117,9 @@ Return valid JSON with:
 
                 # Shot 2 (Blood Sugar / Insulin): Clean biological visualization without people
                 is_blood_sugar_shot = (
-                    idx == 1
+                    (shot_count == 5 and idx == 1)
                     or (("pancreas" in st_lower or "insulin" in st_lower or "blood sugar" in st_lower) and "fiber" not in st_lower and "digestion" not in st_lower and "bloat" not in st_lower)
-                )
+                ) and not is_final_shot
                 if is_blood_sugar_shot and is_nutrition:
                     raw_shot["subject"] = "A clean educational 3D biological visualization without people"
                     raw_shot["setting"] = "In a clean clinical visualization environment with neutral soft studio lighting"
@@ -1033,9 +1136,9 @@ Return valid JSON with:
 
                 # Shot 3 (Low Fiber / Digestion / Energy): Clean digestive visualization without people
                 is_digestion_shot = (
-                    idx == 2
+                    (shot_count == 5 and idx == 2)
                     or ("fiber" in st_lower or "digestion" in st_lower or "bloat" in st_lower or "slows digestion" in st_lower)
-                )
+                ) and not is_final_shot
                 if is_digestion_shot and is_nutrition:
                     raw_shot["subject"] = "A clean educational 3D digestive visualization without people"
                     raw_shot["setting"] = "In a clean educational anatomical visualization space with focused soft studio lighting"
@@ -1052,9 +1155,9 @@ Return valid JSON with:
 
                 # Shot 4 (Practical Swap): Close-up of the young adult's hands
                 is_swap_shot = (
-                    idx == 3
+                    (shot_count == 5 and idx == 3)
                     or any(w in st_lower for w in ["swap", "fruit", "nuts", "whole food", "replace"])
-                )
+                ) and not is_final_shot
                 if is_swap_shot and is_nutrition:
                     raw_shot["subject"] = "Close-up of the young adult's hands"
                     raw_shot["setting"] = "At a clean wooden kitchen counter bathed in warm natural daylight"
@@ -1069,8 +1172,7 @@ Return valid JSON with:
                     )
                     raw_shot["on_screen_text"] = "Swap processed snacks for whole foods"
 
-                # Shot 5 (Consultation + CTA): Recurring character facing camera naturally
-                is_final_shot = (idx == shot_count - 1)
+                # Final Shot (Consultation + CTA): Recurring character facing camera naturally
                 if is_final_shot and is_nutrition:
                     raw_shot["subject"] = f"The recurring {char_desc_stable}"
                     raw_shot["setting"] = "In the bright modern kitchen by the counter with natural window lighting"
@@ -1119,17 +1221,8 @@ Return valid JSON with:
 
                 raw_caption = _sanitize_prompt_text(raw_caption)
 
-                subj = _sanitize_prompt_text(raw_shot.get("subject", "A relatable person").strip())
-                sett = _sanitize_prompt_text(raw_shot.get("setting", "Contemporary bright setting").strip())
-                mot = _sanitize_prompt_text(raw_shot.get("motion", "Natural movement").strip())
-                raw_vdesc = raw_shot.get("visual_description", f"Scene illustrating {dist_item['stage_name']}").strip()
-                for leak_str in all_forbidden_strings:
-                    if leak_str and len(leak_str.strip()) >= 8:
-                        raw_vdesc = re.sub(rf'(?i)[\s"\'*]*' + re.escape(leak_str.strip()) + rf'[\s"\'*.]*', ' ', raw_vdesc)
-                raw_vdesc = re.sub(r'\s+', ' ', raw_vdesc).strip()
-                if not raw_vdesc:
-                    raw_vdesc = f"Visual scene illustrating {dist_item['stage_name']}."
-                vdesc = _sanitize_prompt_text(raw_vdesc)
+                mot = _sanitize_prompt_text(raw_shot.get("motion", "Delivers presentation calmly"))
+                v_desc = _sanitize_prompt_text(raw_shot.get("visual_description", f"{raw_shot.get('subject', 'Presenter')} in {raw_shot.get('setting', 'Studio')}. {mot}."))
 
                 built_shots.append(
                     Shot(
@@ -1138,10 +1231,10 @@ Return valid JSON with:
                         script_stage_order=dist_item["stage_order"],  # Strictly application-controlled
                         script_stage_name=dist_item["stage_name"],  # Strictly application-controlled
                         script_text=dist_item["text"],  # Strictly application-controlled (100% exact copy)
-                        visual_goal=raw_shot.get("visual_goal", f"Visual goal for {dist_item['stage_name']}").strip(),
-                        visual_description=vdesc,
-                        subject=subj,
-                        setting=sett,
+                        visual_goal=raw_shot.get("visual_goal", "Visually support the spoken message.").strip(),
+                        visual_description=v_desc,
+                        subject=_sanitize_prompt_text(raw_shot.get("subject", "Relatable presenter")),
+                        setting=_sanitize_prompt_text(raw_shot.get("setting", "Studio setting")),
                         camera_direction=raw_shot.get("camera_direction", "Vertical 9:16, medium shot, slow push-in").strip(),
                         motion=mot,
                         on_screen_text=raw_caption,
@@ -1162,7 +1255,7 @@ Return valid JSON with:
                 continuity_notes=data.get("continuity_notes", "Consistent vertical 9:16 aesthetic, warm realistic lighting, and natural character progression."),
                 shots=built_shots,
                 generation_source="groq",
-                validation_status="VALID (all 5 shots <= 8.0s, narration timing verified)",
+                validation_status=f"VALID (all {shot_count} shots in [4.0s, 8.0s], narration timing verified)",
                 feedback=feedback
             )
 
